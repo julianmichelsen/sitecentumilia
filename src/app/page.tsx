@@ -13,7 +13,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
-import { getCases, getBlogPosts } from "@/lib/markdown";
+import { getAllPosts } from "@/lib/markdown";
 import { supabase } from "@/lib/supabase";
 
 export const dynamic = 'force-dynamic';
@@ -23,7 +23,7 @@ async function getLogos() { const { data } = await supabase.from('logos').select
 async function getTestimonials() { const { data } = await supabase.from('testimonials').select('*').order('created_at', { ascending: false }); return data || []; }
 
 export default async function Home() {
-  const cases = getCases();
+  const cases = await getAllPosts('cases');
   const logos = await getLogos();
   const testimonials = await getTestimonials();
 
@@ -99,16 +99,16 @@ export default async function Home() {
              </Reveal>
 
              <div className="grid gap-16 md:grid-cols-2">
-                {cases.slice(0, 2).map((item, i) => (
+                {cases.slice(0, 2).map((item: any, i: number) => (
                   <Reveal key={item.slug} className={`stagger-${i+1}`}>
                     <Link href={`/cases/${item.slug}`} className="group relative block rounded-[3.5rem] overflow-hidden glass-elite border-white/5">
                       <div className="aspect-[16/11] overflow-hidden">
-                         <Image src={item.cover_image || ""} alt={item.title} fill className="object-cover transition-all duration-[2s] group-hover:scale-110" />
+                         <Image src={item.coverImage || item.cover_image || ""} alt={item.title} fill className="object-cover transition-all duration-[2s] group-hover:scale-110" />
                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
                       </div>
                       <div className="p-12 space-y-6 relative">
                          <div className="flex gap-4">
-                            {item.services?.split(',').slice(0, 2).map(s => <span key={s} className="px-4 py-1.5 bg-brand-neon/10 border border-brand-neon/20 rounded-full text-[9px] font-black uppercase text-brand-neon tracking-widest">{s}</span>)}
+                            {item.services?.split(',').slice(0, 2).map((s: string) => <span key={s} className="px-4 py-1.5 bg-brand-neon/10 border border-brand-neon/20 rounded-full text-[9px] font-black uppercase text-brand-neon tracking-widest">{s}</span>)}
                          </div>
                          <h3 className="text-3xl font-black text-white italic uppercase tracking-tight group-hover:text-brand-neon transition-colors leading-none">{item.title}</h3>
                          <p className="text-gray-400 text-lg line-clamp-2 leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">"{item.excerpt}"</p>

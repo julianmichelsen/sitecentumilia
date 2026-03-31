@@ -1,85 +1,96 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  LayoutDashboard, 
-  Target, 
   Users, 
-  Briefcase, 
-  CheckSquare, 
-  FileCheck, 
+  LayoutDashboard, 
+  PieChart, 
   Settings, 
-  Menu, X, 
-  LogOut,
-  ChevronRight,
-  TrendingUp
+  LogOut, 
+  Instagram, 
+  Box, 
+  Send,
+  Zap,
+  Briefcase
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
   const pathname = usePathname();
 
   const menuItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
-    { label: 'Comercial (CRM)', icon: Target, isHeader: true },
-    { label: 'Funil de Vendas', icon: Target, path: '/admin/crm' },
-    { label: 'Clientes Ativos', icon: Users, path: '/admin/clients' },
-    { label: 'Operação', icon: Briefcase, isHeader: true },
-    { label: 'Painel de Demandas', icon: CheckSquare, path: '/admin/tasks' },
-    { label: 'Aprovação de Posts', icon: FileCheck, path: '/admin/content' },
-    { label: 'Site Institucional', icon: Briefcase, isHeader: true },
-    { label: 'Blog', icon: Briefcase, path: '/admin/blog' },
-    { label: 'Cases', icon: Briefcase, path: '/admin/cases' },
+    { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
+    { name: 'CRM (Vendas)', icon: PieChart, href: '/admin/crm' },
+    { name: 'Demandas (Op.)', icon: Briefcase, href: '/admin/tasks' },
+    { name: 'Pode Postar?', icon: Instagram, href: '/admin/content' },
+    { name: 'Clientes Ativos', icon: Users, href: '/admin/clients' },
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex">
-      {/* Sidebar Desktop */}
-      <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-[#111] border-r border-[#222] transition-all duration-300 hidden md:flex flex-col sticky top-0 h-screen`}>
-        <div className="p-6 flex items-center justify-between border-b border-[#222]">
-          {isSidebarOpen ? <h1 className="text-xl font-black text-brand-neon tracking-tighter">CENTUMILIA</h1> : <span className="text-brand-neon font-black">C.</span>}
-          <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="text-gray-500 hover:text-white">
-            {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+    <div className="flex min-h-screen bg-brand-darker selection:bg-brand-neon selection:text-black">
+      {/* Sidebar Elite */}
+      <aside className="fixed left-0 top-0 hidden h-screen w-64 flex-col border-r border-white/5 bg-brand-darker p-8 lg:flex z-50">
+        <div className="mb-12 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-neon shadow-[0_0_20px_rgba(1,250,164,0.3)]">
+            <Zap className="h-5 w-5 text-black fill-black" />
+          </div>
+          <div>
+            <span className="block text-sm font-black uppercase tracking-[0.2em] italic">Centumilia</span>
+            <span className="block text-[9px] font-bold uppercase tracking-[0.4em] text-gray-600">Growth Agency</span>
+          </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1 custom-scrollbar">
-          {menuItems.map((item, idx) => {
-            if (item.isHeader) {
-              return isSidebarOpen ? (
-                <div key={idx} className="px-3 pt-6 pb-2 text-[10px] uppercase font-bold text-gray-600 tracking-widest leading-none">
-                  {item.label}
-                </div>
-              ) : <div key={idx} className="h-px bg-[#222] my-4 mx-2" />;
-            }
-
-            const isActive = pathname === item.path;
+        <nav className="flex-1 space-y-2">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href;
             return (
-              <Link key={idx} href={item.path || '#'} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${isActive ? 'bg-brand-neon text-black' : 'text-gray-400 hover:text-white hover:bg-[#1a1a1a]'}`}>
-                <item.icon className="w-5 h-5 shrink-0" />
-                {isSidebarOpen && <span className="text-sm font-bold flex-1">{item.label}</span>}
-                {isSidebarOpen && isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`group flex items-center gap-4 rounded-2xl px-5 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${
+                  isActive 
+                    ? 'bg-brand-neon text-black shadow-[0_0_25px_rgba(1,250,164,0.15)]' 
+                    : 'text-gray-500 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <item.icon className={`h-4 w-4 transition-transform group-hover:scale-110 ${isActive ? 'text-black' : 'text-gray-500 group-hover:text-brand-neon'}`} />
+                {item.name}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-[#222]">
-          <Link href="/admin/login" className="flex items-center gap-3 px-3 py-3 rounded-xl text-red-500 hover:bg-red-500/10 transition-colors">
-            <LogOut className="w-5 h-5" />
-            {isSidebarOpen && <span className="text-sm font-bold">Sair do Painel</span>}
+        <div className="mt-auto pt-8 border-t border-white/5">
+          <Link
+            href="/"
+            className="flex items-center gap-4 px-5 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-gray-700 hover:text-brand-neon transition-all"
+          >
+            <LogOut className="h-4 w-4" /> Sair do Painel
           </Link>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-4 md:p-10 max-h-screen overflow-y-auto">
-        <div className="max-w-7xl mx-auto">
-          {children}
+      {/* Main Content Area */}
+      <main className="flex-1 lg:pl-64">
+        {/* Top Glow Decorator */}
+        <div className="pointer-events-none absolute left-64 top-0 h-[40vh] w-[40vw] bg-brand-neon/5 blur-[120px] rounded-full"></div>
+        
+        <div className="relative mx-auto max-w-7xl px-8 py-12 md:py-20 animate-in fade-in slide-in-from-bottom-2 duration-1000">
+           {children}
         </div>
       </main>
+
+      {/* Mobile Nav (Bottom) */}
+      <nav className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-[2rem] border border-white/10 bg-black/80 p-2 backdrop-blur-2xl lg:hidden shadow-2xl">
+        {menuItems.slice(1).map((item) => {
+           const isActive = pathname === item.href;
+           return (
+             <Link key={item.name} href={item.href} className={`flex h-12 w-12 items-center justify-center rounded-2xl transition-all ${isActive ? 'bg-brand-neon text-black' : 'text-gray-500'}`}>
+                <item.icon className="h-5 w-5" />
+             </Link>
+           );
+        })}
+      </nav>
     </div>
   );
 }

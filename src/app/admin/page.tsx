@@ -1,151 +1,131 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { 
-  Briefcase, FileText, ImageIcon, MessageSquare, Settings,
-  TrendingUp, Eye, ArrowUpRight, Activity
+  Users, 
+  TrendingUp, 
+  Target, 
+  Zap, 
+  CheckCircle2, 
+  Clock, 
+  Briefcase, 
+  ArrowUpRight,
+  BarChart3,
+  Instagram
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function AdminDashboard() {
-  const router = useRouter();
-  const [stats, setStats] = useState({ cases: 0, blog: 0, logos: 0, testimonials: 0 });
+  const [stats, setStats] = useState({ leads: 0, tasks: 0, pending: 0, clients: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadStats() {
-      try {
-        const [casesRes, blogRes, logosRes, testimonialsRes] = await Promise.all([
-          fetch('/api/admin/cases'),
-          fetch('/api/admin/blog'),
-          fetch('/api/admin/logos'),
-          fetch('/api/admin/testimonials'),
-        ]);
+    fetchStats();
+  }, []);
 
-        if (casesRes.status === 401) {
-          router.push('/admin/login');
-          return;
-        }
-
-        const [cases, blog, logos, testimonials] = await Promise.all([
-          casesRes.json(),
-          blogRes.json(),
-          logosRes.json(),
-          testimonialsRes.json(),
-        ]);
-
-        setStats({
-          cases: Array.isArray(cases) ? cases.length : 0,
-          blog: Array.isArray(blog) ? blog.length : 0,
-          logos: Array.isArray(logos) ? logos.length : 0,
-          testimonials: Array.isArray(testimonials) ? testimonials.length : 0,
-        });
-      } catch (error) {
-        console.error('Erro ao carregar stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadStats();
-  }, [router]);
-
-  const statCards = [
-    { label: 'Cases', value: stats.cases, icon: Briefcase, color: '#01FAA4', href: '/admin/cases' },
-    { label: 'Posts do Blog', value: stats.blog, icon: FileText, color: '#BB61EC', href: '/admin/blog' },
-    { label: 'Logos de Clientes', value: stats.logos, icon: ImageIcon, color: '#00DEFE', href: '/admin/logos' },
-    { label: 'Depoimentos', value: stats.testimonials, icon: MessageSquare, color: '#2874EE', href: '/admin/depoimentos' },
-  ];
-
-  const quickActions = [
-    { label: 'Novo Case', href: '/admin/cases?new=true', icon: Briefcase, desc: 'Adicionar estudo de caso' },
-    { label: 'Novo Post', href: '/admin/blog?new=true', icon: FileText, desc: 'Escrever artigo do blog' },
-    { label: 'Configurações', href: '/admin/configuracoes', icon: Settings, desc: 'Editar dados do site' },
-    { label: 'Gerenciar Logos', href: '/admin/logos', icon: ImageIcon, desc: 'Adicionar ou remover logos' },
-  ];
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 border-2 border-[#01FAA4]/30 border-t-[#01FAA4] rounded-full animate-spin" />
-      </div>
-    );
+  async function fetchStats() {
+    try {
+      const [l, t, p, c] = await Promise.all([
+        supabase.from('leads').select('*', { count: 'exact' }),
+        supabase.from('tasks').select('*', { count: 'exact' }).eq('status', 'Produção'),
+        supabase.from('content_posts').select('*', { count: 'exact' }).eq('status', 'Aguardando Cliente'),
+        supabase.from('clients').select('*', { count: 'exact' })
+      ]);
+      setStats({
+        leads: l.count || 0,
+        tasks: t.count || 0,
+        pending: p.count || 0,
+        clients: c.count || 0
+      });
+    } catch (_) {} finally { setLoading(false); }
   }
 
+  const StatCard = ({ title, value, icon: Icon, color, trend }: any) => (
+    <div className="glass-card glass-card-hover rounded-[3rem] p-10 space-y-6 relative overflow-hidden group">
+       <div className={`absolute top-0 right-0 w-32 h-32 opacity-10 blur-[60px] rounded-full translate-x-10 -translate-y-10 ${color}`}></div>
+       <div className="flex items-center justify-between">
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border border-white/5 bg-white/5 group-hover:scale-110 transition-transform ${color.replace('bg-', 'text-')}`}>
+             <Icon className="w-6 h-6" />
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-widest text-green-500 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+             {trend} <ArrowUpRight className="w-3 h-3" />
+          </span>
+       </div>
+       <div className="space-y-1">
+          <h3 className="text-4xl font-black text-white italic tracking-tighter uppercase">{value}</h3>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">{title}</p>
+       </div>
+    </div>
+  );
+
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Visão geral do conteúdo do site</p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {statCards.map((card) => (
-          <Link
-            key={card.label}
-            href={card.href}
-            className="group bg-[#111] border border-[#222] rounded-2xl p-6 hover:border-[#333] transition-all duration-300 hover:shadow-lg"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: `${card.color}15` }}
-              >
-                <card.icon className="w-6 h-6" style={{ color: card.color }} />
-              </div>
-              <ArrowUpRight className="w-4 h-4 text-gray-600 group-hover:text-gray-400 transition-colors" />
-            </div>
-            <p className="text-3xl font-bold text-white mb-1">{card.value}</p>
-            <p className="text-sm text-gray-500">{card.label}</p>
-          </Link>
-        ))}
-      </div>
-
-      {/* Quick Actions */}
-      <div>
-        <h2 className="text-lg font-semibold text-white mb-4">Ações Rápidas</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          {quickActions.map((action) => (
-            <Link
-              key={action.label}
-              href={action.href}
-              className="group flex items-center gap-4 bg-[#111] border border-[#222] rounded-xl p-4 hover:border-[#01FAA4]/30 hover:bg-[#01FAA4]/5 transition-all duration-300"
-            >
-              <div className="w-10 h-10 rounded-lg bg-[#1a1a1a] flex items-center justify-center group-hover:bg-[#01FAA4]/10 transition-colors">
-                <action.icon className="w-5 h-5 text-gray-500 group-hover:text-[#01FAA4] transition-colors" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-white">{action.label}</p>
-                <p className="text-xs text-gray-600">{action.desc}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Activity Section */}
-      <div className="bg-[#111] border border-[#222] rounded-2xl p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <Activity className="w-5 h-5 text-[#01FAA4]" />
-          <h2 className="text-lg font-semibold text-white">Resumo do Conteúdo</h2>
-        </div>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-[#1a1a1a]">
-            <span className="text-gray-400 text-sm">Total de conteúdos publicados</span>
-            <span className="text-white font-bold">{stats.cases + stats.blog}</span>
+    <div className="space-y-14 animate-in fade-in duration-[1500ms]">
+       {/* Welcome Header */}
+       <div className="space-y-4">
+          <div className="flex items-center gap-3 bg-brand-neon/5 w-fit px-4 py-2 rounded-full border border-brand-neon/20">
+             <Zap className="w-4 h-4 text-brand-neon" />
+             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-neon">Sistemas Ativos.</span>
           </div>
-          <div className="flex items-center justify-between py-3 border-b border-[#1a1a1a]">
-            <span className="text-gray-400 text-sm">Empresas parceiras exibidas</span>
-            <span className="text-white font-bold">{stats.logos}</span>
+          <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter text-white uppercase leading-[0.9]">Painel de <br/><span className="text-brand-neon">Comando</span> Centumilia.</h1>
+       </div>
+
+       {/* Quick Stats Grid */}
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <StatCard title="Leads Capturados" value={stats.leads} icon={Target} color="bg-brand-neon" trend="+12% Est." />
+          <StatCard title="Em Operação" value={stats.tasks} icon={Briefcase} color="bg-brand-cyan" trend="Sinc. OK" />
+          <StatCard title="Aguard. Aprovação" value={stats.pending} icon={Instagram} color="bg-brand-blue" trend="3 Críticos" />
+          <StatCard title="Parceiros" value={stats.clients} icon={Users} color="bg-brand-purple" trend="Base Ativa" />
+       </div>
+
+       {/* Active Strategy Area */}
+       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 pt-8">
+          <div className="xl:col-span-2 glass-card rounded-[3.5rem] p-12 space-y-8 relative overflow-hidden">
+             <div className="absolute inset-0 bg-glow-neon opacity-20"></div>
+             <div className="relative z-10 flex items-center justify-between">
+                <div className="space-y-2">
+                   <h3 className="text-2xl font-black italic text-white uppercase tracking-tighter">Metodologia Centumilia</h3>
+                   <p className="text-sm text-gray-500 max-w-md">Seu braço direito na escala comercial. Acompanhe abaixo o crescimento sistêmico da sua agência.</p>
+                </div>
+                <BarChart3 className="w-12 h-12 text-brand-neon opacity-20" />
+             </div>
+             
+             {/* Fake Performance Chart Mock */}
+             <div className="h-48 w-full flex items-end gap-3 px-2 pt-10">
+                {[40, 70, 45, 90, 65, 80, 100, 85, 95].map((h, i) => (
+                  <div key={i} className="flex-1 rounded-t-xl bg-brand-neon/10 border-t border-brand-neon/40 relative group cursor-help transition-all hover:bg-brand-neon/30" style={{ height: `${h}%` }}>
+                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-brand-neon text-black text-[9px] font-black px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        +{h}%
+                     </div>
+                  </div>
+                ))}
+             </div>
           </div>
-          <div className="flex items-center justify-between py-3">
-            <span className="text-gray-400 text-sm">Depoimentos ativos</span>
-            <span className="text-white font-bold">{stats.testimonials}</span>
+
+          <div className="glass-card rounded-[3.5rem] p-12 space-y-10 relative overflow-hidden border-brand-cyan/10">
+              <div className="space-y-4">
+                 <h3 className="text-xl font-black italic text-white uppercase tracking-tighter">Próximos Passos</h3>
+                 <div className="space-y-4">
+                    {[
+                      { icon: Target, text: "Revisar leads da semana", color: "text-brand-neon" },
+                      { icon: Clock, text: "Aprovar posts agendados", color: "text-brand-cyan" },
+                      { icon: CheckCircle2, text: "Relatório de performance", color: "text-brand-purple" }
+                    ].map((item, i) => (
+                       <div key={i} className="flex items-center gap-4 group cursor-pointer">
+                          <div className={`p-3 bg-white/5 rounded-xl border border-white/5 group-hover:scale-110 transition-all ${item.color}`}>
+                             <item.icon className="w-4 h-4" />
+                          </div>
+                          <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest group-hover:text-white transition-all">{item.text}</p>
+                       </div>
+                    ))}
+                 </div>
+              </div>
+
+              <div className="p-6 bg-brand-neon/5 border border-brand-neon/20 rounded-3xl space-y-3">
+                 <p className="text-[9px] font-black text-brand-neon uppercase tracking-widest">Sistema Atualizado</p>
+                 <p className="text-[11px] text-gray-400 leading-relaxed italic">"O método Centumilia automatiza sua prospecção para que você foque no fechamento."</p>
+              </div>
           </div>
-        </div>
-      </div>
+       </div>
     </div>
   );
 }

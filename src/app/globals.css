@@ -2,30 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --brand-neon: #01FAA4;
+  --brand-cyan: #00DEFE;
+  --brand-blue: #2874EE;
+  --brand-purple: #BB61EC;
+  --brand-dark: #0a0a0a;
+  --brand-darker: #050505;
+  --sidebar-w: 260px;
+}
+
 @layer base {
-  :root {
-    --background: #ffffff;
-    --foreground: #161616;
-  }
-
-  /* Emulando o dark mode como padrão premium conforme breifing */
   body {
-    @apply bg-brand-darker text-white;
+    @apply bg-brand-darker text-white antialiased selection:bg-brand-neon selection:text-black;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer components {
+  /* Efeito Vidro Premium */
+  .glass-card {
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.05] shadow-[0_8px_32px_rgba(0,0,0,0.4)];
+  }
+
+  .glass-card-hover {
+    @apply hover:bg-white/[0.06] hover:border-white/[0.1] hover:shadow-brand-neon/10 transition-all duration-500;
+  }
+
+  /* Botões Apple-Style */
+  .btn-elite {
+    @apply relative px-8 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] 
+           transition-all duration-500 overflow-hidden active:scale-95;
+  }
+
+  .btn-elite-neon {
+    @apply btn-elite bg-brand-neon text-black shadow-[0_0_40px_rgba(1,250,164,0.2)] hover:shadow-brand-neon/40;
+  }
+
+  .btn-elite-outline {
+    @apply btn-elite border border-white/10 text-white hover:bg-white/5 hover:border-white/20;
+  }
+
+  /* Kanban Design Pro */
+  .kanban-col {
+    @apply bg-[#0e0e0e] rounded-[2.5rem] p-4 border border-white/[0.02] min-h-[70vh] shadow-inner;
+  }
+
+  /* Glow Effects */
+  .text-glow {
+    text-shadow: 0 0 20px rgba(1,250,164,0.3);
+  }
+
+  .bg-glow-neon {
+    background: radial-gradient(circle at center, rgba(1,250,164,0.15) 0%, transparent 70%);
   }
 }
 
-/* Base styling for headers until fonts are ready */
-h1, h2, h3, h4, h5, h6 {
-  @apply font-bold tracking-tight;
+/* Custom Scrollbar Premium */
+::-webkit-scrollbar {
+  width: 5px;
 }
-
-/* Custom glow effect */
-.hover-glow:hover {
-  box-shadow: 0 0 15px rgba(1, 250, 164, 0.4);
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-neon);
 }

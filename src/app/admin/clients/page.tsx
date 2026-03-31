@@ -12,7 +12,10 @@ import {
   Briefcase,
   X,
   Loader2,
-  CheckCircle2
+  CheckCircle2,
+  ShieldCheck,
+  Building2,
+  Gem
 } from 'lucide-react';
 
 interface Client {
@@ -40,121 +43,110 @@ export default function ClientsPage() {
       const res = await fetch('/api/admin/clients');
       const data = await res.json();
       setClients(Array.isArray(data) ? data : []);
-    } catch (err) { console.error(err); }
+    } catch (_) {}
     finally { setLoading(false); }
   }
 
   async function handleAddClient(e: React.FormEvent) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch('/api/admin/clients', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newClient),
-      });
+      const res = await fetch('/api/admin/clients', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newClient) });
       if (res.ok) {
         setIsModalOpen(false);
         setNewClient({ name: '', company: '', logo_url: '', status: 'Ativo' });
         fetchClients();
       }
-    } catch (err) { console.error(err); }
+    } catch (_) {}
     finally { setSaving(false); }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Putz, tem certeza? Isso vai remover esse cliente e todo o histórico dele da Centumilia.')) return;
+    if (!confirm('Deseja excluir esse parceiro estratégico?')) return;
     try {
       const res = await fetch(`/api/admin/clients?id=${id}`, { method: 'DELETE' });
       if (res.ok) fetchClients();
-    } catch (err) { console.error(err); }
+    } catch (_) {}
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#222] pb-6">
-        <div>
-          <h1 className="text-3xl font-black text-white tracking-tighter uppercase mb-1 flex items-center gap-2">
-             <Users className="w-8 h-8 text-brand-neon" /> Clientes Ativos
-          </h1>
-          <p className="text-gray-500 text-sm">Controle de contratos e parceiros da Centumilia</p>
-        </div>
-        <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 px-6 py-2.5 bg-brand-neon text-black font-black rounded-xl text-sm hover:scale-105 transition-all">
-          <Plus className="w-4 h-4" /> Novo Cliente
-        </button>
+    <div className="space-y-14 animate-in fade-in duration-[1500ms] pb-24">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
+         <div className="space-y-4">
+            <div className="flex items-center gap-3 bg-brand-purple/5 w-fit px-4 py-2 rounded-full border border-brand-purple/20">
+               <Gem className="w-4 h-4 text-brand-purple" />
+               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-purple">Parceiros Elite.</span>
+            </div>
+            <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter text-white uppercase leading-[0.9]">Base de <br/><span className="text-brand-purple">Clientes</span> Centumilia.</h1>
+         </div>
+         <button onClick={() => setIsModalOpen(true)} className="btn-elite-neon bg-brand-purple shadow-brand-purple/20">
+            <Plus className="w-4 h-4 inline mr-2" /> Novo Parceiro
+         </button>
       </div>
 
       {loading ? (
-        <div className="h-64 flex items-center justify-center"><Loader2 className="w-10 h-10 text-brand-neon animate-spin" /></div>
+        <div className="h-64 flex items-center justify-center"><Loader2 className="w-10 h-10 text-brand-purple animate-spin" /></div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
            {clients.map(client => (
-              <div key={client.id} className="bg-[#111] border border-[#222] rounded-3xl p-6 hover:border-brand-neon/30 transition-all group relative overflow-hidden active:scale-[0.98]">
-                 <div className="absolute top-0 right-0 w-24 h-24 bg-brand-neon/5 blur-3xl rounded-full"></div>
+              <div key={client.id} className="glass-card p-10 rounded-[3.5rem] hover:border-brand-purple/30 transition-all duration-500 group relative overflow-hidden active:scale-[0.98]">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-purple/5 blur-[80px] rounded-full translate-x-10 -translate-y-10 group-hover:bg-brand-purple/10 transition-colors"></div>
                  
-                 <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 rounded-2xl bg-brand-dark border border-[#222] flex items-center justify-center text-xl font-black text-gray-500 overflow-hidden">
-                       {client.logo_url ? <img src={client.logo_url} className="w-full h-full object-cover" /> : client.name.charAt(0)}
+                 <div className="flex items-center gap-6 mb-10 relative z-10">
+                    <div className="w-20 h-20 rounded-[2rem] bg-black border border-white/5 flex items-center justify-center text-2xl font-black text-gray-700 overflow-hidden shadow-inner group-hover:scale-110 transition-transform duration-500">
+                       {client.logo_url ? <img src={client.logo_url} className="w-full h-full object-cover" /> : <Building2 className="w-8 h-8 opacity-20" />}
                     </div>
                     <div>
-                       <h3 className="text-white font-bold tracking-tight">{client.name}</h3>
-                       <p className="text-gray-500 text-[11px] font-bold uppercase tracking-widest">{client.company || 'Empresa'}</p>
+                       <h3 className="text-xl font-black italic tracking-tight text-white uppercase leading-none">{client.name}</h3>
+                       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 mt-2">{client.company || 'Corporate'}</p>
                     </div>
                  </div>
 
-                 <div className="grid grid-cols-2 gap-4 border-t border-[#222] pt-6 mb-6">
+                 <div className="grid grid-cols-2 gap-8 border-t border-white/5 pt-8 mb-10 relative z-10">
                     <div className="space-y-1">
-                       <p className="text-[10px] uppercase font-bold text-gray-600 tracking-widest pl-1">Desde</p>
-                       <p className="text-white text-sm font-medium pl-1">{new Date(client.created_at).toLocaleDateString('pt-BR')}</p>
+                       <p className="text-[9px] uppercase font-black text-gray-500 tracking-[0.3em]">Data Base</p>
+                       <p className="text-white text-xs font-bold uppercase">{new Date(client.created_at).toLocaleDateString('pt-BR')}</p>
                     </div>
                     <div className="space-y-1">
-                       <p className="text-[10px] uppercase font-bold text-gray-600 tracking-widest">Contrato</p>
-                       <span className="px-2 py-0.5 bg-green-500/10 text-green-500 text-[10px] font-black uppercase rounded border border-green-500/20 w-fit">{client.status}</span>
+                       <p className="text-[9px] uppercase font-black text-gray-500 tracking-[0.3em]">Status</p>
+                       <span className="flex items-center gap-1.5 text-green-500 text-[10px] font-black uppercase tracking-widest">
+                          <CheckCircle2 className="w-3 h-3" /> {client.status}
+                       </span>
                     </div>
                  </div>
 
-                 <div className="flex gap-2">
-                    <button className="flex-1 px-4 py-2 bg-[#1a1a1a] border border-[#222] rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:border-brand-neon transition-all">Configurar</button>
-                    <button onClick={() => handleDelete(client.id)} className="p-2 bg-[#1a1a1a] border border-[#222] rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-500/10 transition-colors">
-                       <Trash2 className="w-5 h-5 transition-transform group-hover:scale-110" />
+                 <div className="flex gap-3 relative z-10">
+                    <button className="flex-1 btn-elite-outline py-2.5">Dossiê</button>
+                    <button onClick={() => handleDelete(client.id)} className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-gray-700 hover:text-red-500 hover:bg-red-500/10 transition-all border border-white/5">
+                       <Trash2 className="w-5 h-5" />
                     </button>
                  </div>
               </div>
            ))}
 
            {clients.length === 0 && (
-              <div className="col-span-full h-64 border-2 border-dashed border-[#222] rounded-3xl flex flex-col items-center justify-center text-gray-600 gap-4">
-                 <Briefcase className="w-12 h-12 opacity-20" />
-                 <p className="text-sm font-bold uppercase tracking-widest opacity-50">Nenhum cliente cadastrado ainda</p>
+              <div className="col-span-full h-64 border-2 border-dashed border-white/5 rounded-[3rem] flex flex-col items-center justify-center text-gray-700 gap-4 opacity-50">
+                 <Briefcase className="w-12 h-12 opacity-10" />
+                 <p className="text-[10px] font-black uppercase tracking-[0.5em]">Base Estratégica Vazia</p>
               </div>
            )}
         </div>
       )}
 
-      {/* Modal Novo Cliente */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-           <div className="bg-[#111] border border-[#222] w-full max-w-lg rounded-[2.5rem] p-10 space-y-8 animate-in zoom-in duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-darker/95 backdrop-blur-2xl p-6">
+           <div className="w-full max-w-xl rounded-[4rem] border border-white/10 bg-[#0a0a0a] p-12 space-y-10 animate-in zoom-in duration-500 shadow-2xl relative overflow-hidden shadow-brand-purple/10">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-purple to-brand-blue"></div>
               <div className="flex items-center justify-between">
-                 <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Novo Cliente</h2>
-                 <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white"><X className="w-6 h-6" /></button>
+                 <h2 className="text-3xl font-black italic text-white uppercase tracking-tighter">Novo Parceiro</h2>
+                 <button onClick={() => setIsModalOpen(false)} className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center text-gray-500 hover:text-white transition-all"><X className="w-6 h-6" /></button>
               </div>
-              <form onSubmit={handleAddClient} className="space-y-5">
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest pl-1">Nome do Responsável</label>
-                    <input required className="w-full bg-black border border-[#222] p-4 rounded-2xl text-sm text-white focus:border-brand-neon outline-none" value={newClient.name} onChange={e => setNewClient({...newClient, name: e.target.value})} />
-                 </div>
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest pl-1">Nome da Empresa</label>
-                    <input className="w-full bg-black border border-[#222] p-4 rounded-2xl text-sm text-white focus:border-brand-neon outline-none" value={newClient.company} onChange={e => setNewClient({...newClient, company: e.target.value})} />
-                 </div>
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest pl-1">URL do Logo (Opcional)</label>
-                    <input className="w-full bg-black border border-[#222] p-4 rounded-2xl text-sm text-white focus:border-brand-neon outline-none" value={newClient.logo_url} onChange={e => setNewClient({...newClient, logo_url: e.target.value})} />
-                 </div>
-                 <button disabled={saving} className="w-full bg-brand-neon p-5 rounded-2xl text-black font-black uppercase tracking-[0.2em] text-xs hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-brand-neon/20">
-                    {saving ? 'Cadastrando...' : 'Finalizar Cadastro'}
+              <form onSubmit={handleAddClient} className="space-y-6">
+                 <input placeholder="Responsável Centumilia" required className="w-full bg-white/5 border border-white/5 p-5 rounded-2xl text-sm focus:border-brand-purple outline-none text-white transition-all" value={newClient.name} onChange={e => setNewClient({...newClient, name: e.target.value})} />
+                 <input placeholder="Razão Social / Nome Fantasia" className="w-full bg-white/5 border border-white/5 p-5 rounded-2xl text-sm focus:border-brand-purple outline-none text-white transition-all" value={newClient.company} onChange={e => setNewClient({...newClient, company: e.target.value})} />
+                 <input placeholder="URL da Identidade Visual" className="w-full bg-white/5 border border-white/5 p-5 rounded-2xl text-sm focus:border-brand-purple outline-none text-white transition-all" value={newClient.logo_url} onChange={e => setNewClient({...newClient, logo_url: e.target.value})} />
+                 <button disabled={saving} className="w-full btn-elite-neon bg-brand-purple shadow-brand-purple/20 scale-y-110">
+                    {saving ? 'Validando...' : 'Integrar Parceiro Elite'}
                  </button>
               </form>
            </div>

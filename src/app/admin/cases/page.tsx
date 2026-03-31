@@ -181,11 +181,11 @@ function AdminCasesContent() {
                     <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Capa (URL)</span>
                     <div className="flex gap-2">
                        <input value={editing.coverImage || ''} onChange={(e) => setEditing({...editing, coverImage: e.target.value})}
-                         className="flex-1 h-11 px-4 bg-[#0a0a0a] border border-[#333] rounded-xl text-white outline-none focus:border-brand-neon" />
-                       <label className="h-11 px-4 bg-[#222] rounded-xl flex items-center cursor-pointer text-xs font-bold text-gray-300">
+                         className="flex-1 h-11 px-4 bg-[#0a0a0a] border border-[#333] rounded-xl text-white focus:border-brand-neon" />
+                       <label className={`h-11 px-4 rounded-xl flex items-center justify-center cursor-pointer text-xs font-bold transition-all ${uploading ? 'bg-[#333] text-gray-500' : 'bg-[#222] hover:bg-[#333] text-gray-300'}`}>
                           {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
-                          Upload
-                          <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
+                          {uploading ? 'Subindo...' : 'Fazer Upload'}
+                          <input type="file" className="hidden" accept="image/*" disabled={uploading} onChange={handleFileUpload} />
                        </label>
                     </div>
                  </div>

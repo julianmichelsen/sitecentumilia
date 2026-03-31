@@ -1,7 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    unoptimized: true, // Since we are exporting or dealing with local markdown images often
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'mkwtucdmvnlgguyxmzyv.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      }
+    ],
   },
 };
 

@@ -1,13 +1,24 @@
-import Link from "next/link";
-import { Mail, Phone, MapPin, Send, ArrowRight } from "lucide-react";
-import type { Metadata } from "next";
+'use client';
 
-export const metadata: Metadata = {
-  title: "Contato | Centumilia",
-  description: "Agende uma reunião de diagnóstico gratuita com a Centumilia. Descubra como o método CENTUM pode acelerar o crescimento do seu negócio.",
-};
+import { useState } from "react";
+import Link from "next/link";
+import { Mail, Phone, MapPin, Send, ArrowRight, CheckCircle } from "lucide-react";
 
 export default function ContatoPage() {
+  const [enviado, setEnviado] = useState(false);
+  const [carregando, setCarregando] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setCarregando(true);
+    
+    // Simulação de envio (já que ainda não configuramos o serviço de e-mail)
+    setTimeout(() => {
+      setCarregando(false);
+      setEnviado(true);
+    }, 1500);
+  }
+
   return (
     <main className="min-h-screen">
       {/* Hero */}
@@ -30,88 +41,97 @@ export default function ContatoPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             
             {/* Form */}
-            <div className="bg-[#111] border border-brand-dark rounded-2xl p-8 md:p-10 space-y-6">
-              <h2 className="text-2xl font-bold text-white">Solicitar Diagnóstico</h2>
-              <p className="text-gray-400 text-sm">Preencha os campos e entraremos em contato em até 24 horas úteis.</p>
-              
-              <form className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="nome" className="block text-sm font-medium text-gray-300 mb-1.5">Nome completo</label>
-                    <input 
-                      type="text" 
-                      id="nome"
-                      placeholder="Seu nome"
-                      className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors"
-                    />
+            <div className="bg-[#111] border border-brand-dark rounded-2xl p-8 md:p-10 space-y-6 relative overflow-hidden">
+              {enviado ? (
+                <div className="py-12 text-center space-y-6 animate-in fade-in zoom-in duration-500">
+                  <div className="w-20 h-20 bg-brand-neon/10 rounded-full flex items-center justify-center mx-auto text-brand-neon">
+                    <CheckCircle className="w-10 h-10" />
                   </div>
-                  <div>
-                    <label htmlFor="empresa" className="block text-sm font-medium text-gray-300 mb-1.5">Empresa</label>
-                    <input 
-                      type="text" 
-                      id="empresa"
-                      placeholder="Nome da sua empresa"
-                      className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors"
-                    />
+                  <div className="space-y-2">
+                    <h2 className="text-3xl font-bold text-white">Solicitação Enviada!</h2>
+                    <p className="text-gray-400">Excelente. Nossa equipe entrará em contato em breve para agendar seu diagnóstico.</p>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">E-mail</label>
-                    <input 
-                      type="email" 
-                      id="email"
-                      placeholder="seu@email.com"
-                      className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="telefone" className="block text-sm font-medium text-gray-300 mb-1.5">WhatsApp</label>
-                    <input 
-                      type="tel" 
-                      id="telefone"
-                      placeholder="(54) 99944-1227"
-                      className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="segmento" className="block text-sm font-medium text-gray-300 mb-1.5">Segmento de mercado</label>
-                  <select 
-                    id="segmento"
-                    className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors"
+                  <button 
+                    onClick={() => setEnviado(false)}
+                    className="text-brand-neon hover:text-white transition-colors text-sm font-medium"
                   >
-                    <option value="">Selecione seu segmento</option>
-                    <option value="ecommerce">E-commerce</option>
-                    <option value="servicos">Serviços Profissionais</option>
-                    <option value="saude">Saúde e Bem-estar</option>
-                    <option value="industria">Indústria e Logística</option>
-                    <option value="imobiliario">Mercado Imobiliário</option>
-                    <option value="educacao">Educação</option>
-                    <option value="outro">Outro</option>
-                  </select>
+                    Enviar outra mensagem
+                  </button>
                 </div>
+              ) : (
+                <>
+                  <h2 className="text-2xl font-bold text-white">Solicitar Diagnóstico</h2>
+                  <p className="text-gray-400 text-sm">Preencha os campos e entraremos em contato em até 24 horas úteis.</p>
+                  
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="nome" className="block text-sm font-medium text-gray-300 mb-1.5">Nome completo</label>
+                        <input required type="text" id="nome" placeholder="Seu nome"
+                          className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="empresa" className="block text-sm font-medium text-gray-300 mb-1.5">Empresa</label>
+                        <input required type="text" id="empresa" placeholder="Nome da sua empresa"
+                          className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors"
+                        />
+                      </div>
+                    </div>
 
-                <div>
-                  <label htmlFor="mensagem" className="block text-sm font-medium text-gray-300 mb-1.5">Conte-nos seu maior desafio</label>
-                  <textarea 
-                    id="mensagem"
-                    rows={4}
-                    placeholder="O que mais te incomoda em marketing e vendas hoje?"
-                    className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors resize-none"
-                  ></textarea>
-                </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">E-mail</label>
+                        <input required type="email" id="email" placeholder="seu@email.com"
+                          className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="telefone" className="block text-sm font-medium text-gray-300 mb-1.5">WhatsApp</label>
+                        <input required type="tel" id="telefone" placeholder="(54) 99944-1227"
+                          className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors"
+                        />
+                      </div>
+                    </div>
 
-                <button 
-                  type="submit"
-                  className="w-full inline-flex h-14 items-center justify-center rounded-md bg-brand-neon px-8 text-base font-bold text-brand-darker transition-all duration-300 hover:bg-white hover:shadow-[0_0_20px_rgba(1,250,164,0.4)]"
-                >
-                  <Send className="w-5 h-5 mr-2" />
-                  Enviar Solicitação
-                </button>
-              </form>
+                    <div>
+                      <label htmlFor="segmento" className="block text-sm font-medium text-gray-300 mb-1.5">Segmento de mercado</label>
+                      <select id="segmento" required
+                        className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors"
+                      >
+                        <option value="">Selecione seu segmento</option>
+                        <option value="ecommerce">E-commerce</option>
+                        <option value="servicos">Serviços Profissionais</option>
+                        <option value="saude">Saúde e Bem-estar</option>
+                        <option value="industria">Indústria e Logística</option>
+                        <option value="imobiliario">Mercado Imobiliário</option>
+                        <option value="educacao">Educação</option>
+                        <option value="outro">Outro</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label htmlFor="mensagem" className="block text-sm font-medium text-gray-300 mb-1.5">Conte-nos seu maior desafio</label>
+                      <textarea id="mensagem" rows={4} placeholder="O que mais te incomoda em marketing e vendas hoje?"
+                        className="w-full rounded-md border border-brand-dark bg-brand-darker px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-colors resize-none"
+                      ></textarea>
+                    </div>
+
+                    <button disabled={carregando} type="submit"
+                      className="w-full inline-flex h-14 items-center justify-center rounded-md bg-brand-neon px-8 text-base font-bold text-brand-darker transition-all duration-300 hover:bg-white hover:shadow-[0_0_20px_rgba(1,250,164,0.4)] disabled:opacity-50"
+                    >
+                      {carregando ? (
+                        <div className="w-5 h-5 border-2 border-brand-darker/30 border-t-brand-darker rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <Send className="w-5 h-5 mr-2" />
+                          Enviar Solicitação
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </>
+              )}
             </div>
 
             {/* Info Side */}
@@ -154,25 +174,6 @@ export default function ContatoPage() {
                   <div>
                     <p className="text-white font-bold mb-1">Localização</p>
                     <p className="text-gray-400 text-sm">Garibaldi, RS — Atendimento em todo o Brasil</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* FAQ Rápido */}
-              <div className="mt-8 p-6 bg-[#111] border border-brand-dark rounded-2xl space-y-4">
-                <h3 className="text-white font-bold text-lg">Perguntas frequentes</h3>
-                <div className="space-y-3 text-sm">
-                  <div>
-                    <p className="text-white font-medium">O diagnóstico é realmente gratuito?</p>
-                    <p className="text-gray-400 mt-1">Sim. É uma reunião estratégica de 30 minutos sem compromisso.</p>
-                  </div>
-                  <div className="border-t border-brand-dark pt-3">
-                    <p className="text-white font-medium">Atendem fora do Rio Grande do Sul?</p>
-                    <p className="text-gray-400 mt-1">Sim. Trabalhamos 100% remoto com clientes de todo o Brasil.</p>
-                  </div>
-                  <div className="border-t border-brand-dark pt-3">
-                    <p className="text-white font-medium">Qual o investimento mínimo?</p>
-                    <p className="text-gray-400 mt-1">Depende do escopo. Temos planos a partir de necessidades básicas até operações completas de growth.</p>
                   </div>
                 </div>
               </div>

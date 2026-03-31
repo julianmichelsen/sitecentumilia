@@ -19,7 +19,7 @@ export default async function CasesList() {
 
         <div className="grid gap-8 md:grid-cols-2">
           {cases.map((caseStudy) => (
-            <article key={caseStudy.slug} className="group flex flex-col overflow-hidden rounded-2xl border border-brand-dark bg-brand-darker/30 transition-all hover:-translate-y-1 hover:border-brand-neon/50">
+            <article key={caseStudy.slug} className="relative group flex flex-col overflow-hidden rounded-2xl border border-brand-dark bg-brand-darker/30 transition-all hover:-translate-y-1 hover:border-brand-neon/50">
               <div className="p-8 space-y-4 flex-grow">
                 <div className="inline-flex items-center rounded-full bg-brand-purple/10 px-3 py-1 text-xs font-medium text-brand-purple">
                   <Trophy className="mr-1 h-3 w-3" />

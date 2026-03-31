@@ -4,37 +4,40 @@ import { supabase } from '@/lib/supabase';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { nome, empresa, email, telefone, segmento, mensagem } = body;
+    const { nome, email, phone, empresa, segment, message } = body;
 
-    if (!nome || !email || !telefone) {
-      return NextResponse.json({ error: 'Campos obrigatórios faltando' }, { status: 400 });
-    }
-
-    // Tenta salvar no Supabase na tabela 'leads'
-    // Se a tabela não existir, ele vai dar erro, mas o log vai nos avisar
-    const { error } = await supabase
+    // 1. Grava o lead na tabela 'leads' do CRM Centumilia
+    const { data: leadData, error: leadError } = await supabase
       .from('leads')
       .insert([
         { 
           nome, 
-          empresa, 
           email, 
-          phone: telefone, 
-          segment: segmento, 
-          message: mensagem,
-          created_at: new Date().toISOString() 
+          phone, 
+          empresa: empresa || 'N/A', 
+          segment: segment || 'Geral', 
+          message,
+          status: 'Novo' 
         }
-      ]);
+      ])
+      .select()
+      .single();
 
-    if (error) {
-      console.error('Erro ao salvar lead:', error);
-      // Mesmo com erro no banco, vamos simular sucesso para o usuário não travar
-      // Mas avisamos no console do servidor
+    if (leadError) {
+      console.error('Erro ao salvar lead no banco:', leadError);
+      return NextResponse.json({ error: 'Erro ao processar sua solicitação.' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
-  } catch (err: any) {
-    console.error('Erro na API de contato:', err);
-    return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
+    // 2. Aqui você poderia adicionar um envio de e-mail (Resend/Nodemailer)
+    // Por enquanto, o lead já está seguro no seu ERP Centumilia.
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Sua solicitação foi enviada com sucesso! Nossa equipe entrará em contato em breve.' 
+    });
+
+  } catch (error) {
+    console.error('Erro na API de contato:', error);
+    return NextResponse.json({ error: 'Ocorreu um erro inesperado.' }, { status: 500 });
   }
 }

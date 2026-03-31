@@ -171,9 +171,29 @@ function AdminCasesContent() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">Imagem de Capa (caminho)</label>
-              <input value={editing.coverImage || ''} onChange={(e) => setEditing({...editing, coverImage: e.target.value})}
-                className="w-full h-11 px-4 bg-[#0a0a0a] border border-[#333] rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-[#01FAA4] transition-all"
-                placeholder="/cases/imagem.png" />
+              <div className="flex gap-2">
+                <input value={editing.coverImage || ''} onChange={(e) => setEditing({...editing, coverImage: e.target.value})}
+                  className="flex-1 h-11 px-4 bg-[#0a0a0a] border border-[#333] rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-[#01FAA4] transition-all"
+                  placeholder="/cases/imagem.png" />
+                <label className="h-11 px-4 bg-[#222] hover:bg-[#333] border border-[#333] rounded-xl flex items-center justify-center cursor-pointer text-gray-300 transition-all">
+                  <Plus className="w-4 h-4 mr-2" /> Fazer Upload
+                  <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    try {
+                      setMessage('Enviando imagem...');
+                      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+                      const data = await res.json();
+                      if (data.url) {
+                        setEditing({ ...editing, coverImage: data.url });
+                        setMessage('Imagem enviada!');
+                      }
+                    } catch (err) { setMessage('Erro no upload'); }
+                  }} />
+                </label>
+              </div>
             </div>
           </div>
 

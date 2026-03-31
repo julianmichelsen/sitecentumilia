@@ -1,40 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '@/lib/auth';
-import fs from 'fs';
-import path from 'path';
+import { supabase } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   if (!isAuthenticated()) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
-  
+
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const directory = formData.get('directory') as string || 'logos';
-    
     if (!file) {
       return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    
-    const uploadDir = path.join(process.cwd(), 'public', directory);
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+    const filePath = `uploads/${fileName}`;
+
+    // Upload para o Supabase Storage (Bucket 'media')
+    const { data, error } = await supabase.storage
+      .from('media')
+      .upload(filePath, file);
+
+    if (error) {
+      console.error('Erro no Storage:', error);
+      return NextResponse.json({ error: 'Erro no upload para o banco' }, { status: 500 });
     }
-    
-    const fileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').toLowerCase();
-    const filePath = path.join(uploadDir, fileName);
-    fs.writeFileSync(filePath, buffer);
-    
-    return NextResponse.json({ 
-      success: true, 
-      path: `/${directory}/${fileName}`,
-      fileName 
-    });
-  } catch (error) {
-    return NextResponse.json({ error: 'Erro ao fazer upload' }, { status: 500 });
+
+    // Gerar a URL pública
+    const { data: { publicUrl } } = supabase.storage
+      .from('media')
+      .getPublicUrl(filePath);
+
+    return NextResponse.json({ url: publicUrl });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Erro interno ao processar upload' }, { status: 500 });
   }
 }

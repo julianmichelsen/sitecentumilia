@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-// GET: Lista todos os posts
-export async function GET() {
-  const { data, error } = await supabase
+// GET: Lista todos os posts OU filtra por um magic_link específico
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const magicLink = searchParams.get('magic_link');
+
+  let query = supabase
     .from('content_posts')
-    .select('*')
-    .order('created_at', { ascending: false });
+    .select('*');
+
+  if (magicLink) {
+    query = query.eq('magic_link', magicLink);
+  } else {
+    query = query.order('created_at', { ascending: false });
+  }
+
+  const { data, error } = await query;
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
@@ -18,6 +28,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { client_id, title, media_url, caption, scheduled_at } = body;
 
+    // Gerando ID único para o link de aprovação
+    const magic_link = crypto.randomUUID();
+
     const { data, error } = await supabase
       .from('content_posts')
       .insert([{ 
@@ -25,9 +38,9 @@ export async function POST(request: NextRequest) {
         title, 
         media_url, 
         caption, 
-        scheduled_at, 
+        scheduled_at: scheduled_at || null, 
         status: 'Em Análise',
-        magic_link: crypto.randomUUID()
+        magic_link
       }])
       .select()
       .single();

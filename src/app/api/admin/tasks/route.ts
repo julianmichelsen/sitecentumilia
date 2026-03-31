@@ -30,3 +30,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
 }
+
+// PATCH: Atualiza o status de uma tarefa
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, status } = body;
+
+    const { data, error } = await supabase
+      .from('tasks')
+      .update({ status })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(data);
+  } catch (err) {
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+  }
+}

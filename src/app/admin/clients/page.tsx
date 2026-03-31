@@ -63,10 +63,10 @@ export default function ClientsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Tem certeza? Isso apagará todas as tarefas e posts desse cliente.')) return;
+    if (!confirm('Putz, tem certeza? Isso vai remover esse cliente e todo o histórico dele da Centumilia.')) return;
     try {
-      // API DELETE seria bom aqui, mas por ora vamos focar no fluxo de criação
-      console.log('Delete client', id);
+      const res = await fetch(`/api/admin/clients?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchClients();
     } catch (err) { console.error(err); }
   }
 
@@ -90,7 +90,7 @@ export default function ClientsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
            {clients.map(client => (
-              <div key={client.id} className="bg-[#111] border border-[#222] rounded-3xl p-6 hover:border-brand-neon/30 transition-all group relative overflow-hidden">
+              <div key={client.id} className="bg-[#111] border border-[#222] rounded-3xl p-6 hover:border-brand-neon/30 transition-all group relative overflow-hidden active:scale-[0.98]">
                  <div className="absolute top-0 right-0 w-24 h-24 bg-brand-neon/5 blur-3xl rounded-full"></div>
                  
                  <div className="flex items-center gap-4 mb-6">
@@ -99,28 +99,25 @@ export default function ClientsPage() {
                     </div>
                     <div>
                        <h3 className="text-white font-bold tracking-tight">{client.name}</h3>
-                       <p className="text-gray-500 text-xs">{client.company || 'Empresa'}</p>
-                    </div>
-                    <div className="ml-auto flex flex-col items-end gap-2">
-                       <span className="px-2 py-0.5 bg-green-500/10 text-green-500 text-[10px] font-black uppercase rounded border border-green-500/20">{client.status}</span>
+                       <p className="text-gray-500 text-[11px] font-bold uppercase tracking-widest">{client.company || 'Empresa'}</p>
                     </div>
                  </div>
 
                  <div className="grid grid-cols-2 gap-4 border-t border-[#222] pt-6 mb-6">
                     <div className="space-y-1">
-                       <p className="text-[10px] uppercase font-bold text-gray-600 tracking-widest">Desde</p>
-                       <p className="text-white text-sm font-medium">{new Date(client.created_at).toLocaleDateString('pt-BR')}</p>
+                       <p className="text-[10px] uppercase font-bold text-gray-600 tracking-widest pl-1">Desde</p>
+                       <p className="text-white text-sm font-medium pl-1">{new Date(client.created_at).toLocaleDateString('pt-BR')}</p>
                     </div>
                     <div className="space-y-1">
                        <p className="text-[10px] uppercase font-bold text-gray-600 tracking-widest">Contrato</p>
-                       <p className="text-brand-cyan text-sm font-medium">Ativo</p>
+                       <span className="px-2 py-0.5 bg-green-500/10 text-green-500 text-[10px] font-black uppercase rounded border border-green-500/20 w-fit">{client.status}</span>
                     </div>
                  </div>
 
                  <div className="flex gap-2">
-                    <button className="flex-1 px-4 py-2 bg-[#1a1a1a] border border-[#222] rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:border-brand-neon transition-all">Editar</button>
-                    <button className="p-2 bg-[#1a1a1a] border border-[#222] rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-500/10 transition-colors">
-                       <Trash2 className="w-5 h-5" />
+                    <button className="flex-1 px-4 py-2 bg-[#1a1a1a] border border-[#222] rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:border-brand-neon transition-all">Configurar</button>
+                    <button onClick={() => handleDelete(client.id)} className="p-2 bg-[#1a1a1a] border border-[#222] rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-500/10 transition-colors">
+                       <Trash2 className="w-5 h-5 transition-transform group-hover:scale-110" />
                     </button>
                  </div>
               </div>
@@ -138,26 +135,26 @@ export default function ClientsPage() {
       {/* Modal Novo Cliente */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-           <div className="bg-[#111] border border-[#222] w-full max-w-lg rounded-3xl p-8 space-y-6 animate-in zoom-in duration-300">
+           <div className="bg-[#111] border border-[#222] w-full max-w-lg rounded-[2.5rem] p-10 space-y-8 animate-in zoom-in duration-300">
               <div className="flex items-center justify-between">
                  <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Novo Cliente</h2>
                  <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white"><X className="w-6 h-6" /></button>
               </div>
-              <form onSubmit={handleAddClient} className="space-y-4">
+              <form onSubmit={handleAddClient} className="space-y-5">
                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Nome do Responsável</label>
-                    <input required className="w-full bg-black border border-[#222] p-4 rounded-xl text-sm text-white" value={newClient.name} onChange={e => setNewClient({...newClient, name: e.target.value})} />
+                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest pl-1">Nome do Responsável</label>
+                    <input required className="w-full bg-black border border-[#222] p-4 rounded-2xl text-sm text-white focus:border-brand-neon outline-none" value={newClient.name} onChange={e => setNewClient({...newClient, name: e.target.value})} />
                  </div>
                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Nome da Empresa</label>
-                    <input className="w-full bg-black border border-[#222] p-4 rounded-xl text-sm text-white" value={newClient.company} onChange={e => setNewClient({...newClient, company: e.target.value})} />
+                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest pl-1">Nome da Empresa</label>
+                    <input className="w-full bg-black border border-[#222] p-4 rounded-2xl text-sm text-white focus:border-brand-neon outline-none" value={newClient.company} onChange={e => setNewClient({...newClient, company: e.target.value})} />
                  </div>
                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">URL do Logo (Opcional)</label>
-                    <input className="w-full bg-black border border-[#222] p-4 rounded-xl text-sm text-white" value={newClient.logo_url} onChange={e => setNewClient({...newClient, logo_url: e.target.value})} />
+                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest pl-1">URL do Logo (Opcional)</label>
+                    <input className="w-full bg-black border border-[#222] p-4 rounded-2xl text-sm text-white focus:border-brand-neon outline-none" value={newClient.logo_url} onChange={e => setNewClient({...newClient, logo_url: e.target.value})} />
                  </div>
-                 <button disabled={saving} className="w-full bg-brand-neon p-4 rounded-xl text-black font-black uppercase tracking-widest text-sm hover:scale-105 transition-transform disabled:opacity-50 shadow-lg shadow-brand-neon/20">
-                    {saving ? 'Salvando...' : 'Cadastrar na Centumilia'}
+                 <button disabled={saving} className="w-full bg-brand-neon p-5 rounded-2xl text-black font-black uppercase tracking-[0.2em] text-xs hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-brand-neon/20">
+                    {saving ? 'Cadastrando...' : 'Finalizar Cadastro'}
                  </button>
               </form>
            </div>

@@ -28,9 +28,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { client_id, title, media_url, caption, scheduled_at } = body;
 
-    // Gerando ID único para o link de aprovação
-    const magic_link = crypto.randomUUID();
-
     const { data, error } = await supabase
       .from('content_posts')
       .insert([{ 
@@ -40,7 +37,7 @@ export async function POST(request: NextRequest) {
         caption, 
         scheduled_at: scheduled_at || null, 
         status: 'Em Análise',
-        magic_link
+        magic_link: crypto.randomUUID()
       }])
       .select()
       .single();
@@ -52,21 +49,37 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PATCH: Atualiza aprovado/ajuste (pelo magic link)
+// PATCH: Edição COMPLETA do post de aprovação
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { magic_link, status, feedback } = body;
+    const { id, magic_link, ...updates } = body;
 
-    const { data, error } = await supabase
-      .from('content_posts')
-      .update({ status, client_feedback: feedback })
-      .eq('magic_link', magic_link)
-      .select()
-      .single();
+    // Se temos magic_link mas não id (vindo do portal do cliente)
+    if (!id && magic_link) {
+      const { data, error } = await supabase
+        .from('content_posts')
+        .update(updates)
+        .eq('magic_link', magic_link)
+        .select()
+        .single();
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(data);
+    }
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json(data);
+    // Se temos ID (vindo do painel admin)
+    if (id) {
+       const { data, error } = await supabase
+        .from('content_posts')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+       return NextResponse.json(data);
+    }
+
+    return NextResponse.json({ error: 'ID or Magic Link is required' }, { status: 400 });
   } catch (err) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }

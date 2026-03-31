@@ -10,7 +10,9 @@ import {
   Mail, 
   Loader2,
   X,
-  ChevronRight
+  Edit2,
+  CheckCircle2,
+  Trash2
 } from 'lucide-react';
 
 interface Lead {
@@ -22,7 +24,6 @@ interface Lead {
   segment: string;
   message: string;
   status: string;
-  created_at: string;
 }
 
 const COLUMNS = ['Novo', 'Em Contato', 'Diagnóstico', 'Proposta', 'Fechado', 'Perdido'];
@@ -39,12 +40,13 @@ const COLUMN_COLORS: Record<string, string> = {
 export default function CRMPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editLead, setEditLead] = useState<Lead | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newLead, setNewLead] = useState({ nome: '', empresa: '', email: '', phone: '', segment: '', message: '', status: 'Novo' });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchLeads();
+     fetchLeads();
   }, []);
 
   async function fetchLeads() {
@@ -52,136 +54,120 @@ export default function CRMPage() {
       const res = await fetch('/api/admin/leads');
       const data = await res.json();
       setLeads(Array.isArray(data) ? data : []);
-    } catch (err) { console.error(err); }
+    } catch (_) {}
     finally { setLoading(false); }
   }
 
-  async function handleAddLead(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      const res = await fetch('/api/admin/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newLead),
-      });
-      if (res.ok) {
-        setIsModalOpen(false);
-        setNewLead({ nome: '', empresa: '', email: '', phone: '', segment: '', message: '', status: 'Novo' });
-        fetchLeads();
-      }
-    } catch (err) { console.error(err); }
-    finally { setSaving(false); }
-  }
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData('leadId', id);
+  };
 
-  async function updateLeadStatus(id: string, currentStatus: string) {
-    // Implementando um movimento linear para facilitar o fluxo (Novo -> Em Contato -> etc)
-    const currentIndex = COLUMNS.indexOf(currentStatus);
-    const nextIndex = (currentIndex + 1) % COLUMNS.length;
-    const nextStatus = COLUMNS[nextIndex];
-
-    try {
+  const handleDrop = async (e: React.DragEvent, newStatus: string) => {
+    const id = e.dataTransfer.getData('leadId');
+    const lead = leads.find(l => l.id === id);
+    if (lead && lead.status !== newStatus) {
+      setLeads(leads.map(l => l.id === id ? { ...l, status: newStatus } : l));
       await fetch('/api/admin/leads', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status: nextStatus }),
+        body: JSON.stringify({ id, status: newStatus }),
       });
+    }
+  };
+
+  async function handleSaveLead(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    const isEdit = !!editLead;
+    const res = await fetch('/api/admin/leads', {
+      method: isEdit ? 'PATCH' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(isEdit ? editLead : newLead),
+    });
+    if (res.ok) {
+      setIsModalOpen(false);
+      setEditLead(null);
       fetchLeads();
-    } catch (err) { console.error(err); }
+    }
+    setSaving(false);
   }
 
   const renderCard = (l: Lead) => (
     <div key={l.id} 
-      onClick={() => updateLeadStatus(l.id, l.status)}
-      className="bg-[#111] border border-[#222] p-5 rounded-2xl shadow-xl hover:border-brand-neon/40 transition-all cursor-pointer group active:scale-95"
+      draggable 
+      onDragStart={(e) => handleDragStart(e, l.id)}
+      className="bg-[#111] border border-[#222] p-5 rounded-2xl shadow-xl hover:border-brand-neon/40 transition-all cursor-move group"
     >
-       <div className="flex items-center justify-between mb-4 text-[9px] text-gray-600 font-black uppercase tracking-[0.2em]">
-         <span>{l.segment || 'Geral'}</span>
-         <ChevronRight className="w-3 h-3 group-hover:text-brand-neon group-hover:translate-x-1 transition-all" />
+       <div className="flex items-center justify-between mb-4">
+          <span className="text-[9px] font-black uppercase text-gray-600 tracking-[0.2em]">{l.segment || 'Geral'}</span>
+          <button onClick={() => { setEditLead(l); setIsModalOpen(true); }} className="p-1 px-2 border border-white/5 rounded-lg text-gray-500 hover:text-brand-neon hover:bg-brand-neon/10 transition-all text-[8px] font-black uppercase tracking-widest">
+             EDITAR
+          </button>
        </div>
        <h4 className="text-white font-bold text-sm mb-1">{l.nome}</h4>
-       <p className="text-gray-500 text-[11px] mb-4 italic line-clamp-1">{l.empresa || 'Empresa Direta'}</p>
+       <p className="text-gray-500 text-[10px] mb-4">{l.empresa || 'Sem Empresa'}</p>
        
-       <div className="space-y-2 mb-4 border-t border-white/5 pt-3">
+       <div className="space-y-2 mb-2 border-t border-white/5 pt-3">
          {l.phone && <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium"><Phone className="w-3 h-3 text-brand-neon" /> {l.phone}</div>}
-         {l.email && <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium"><Mail className="w-3 h-3 text-brand-cyan" /> {l.email}</div>}
        </div>
     </div>
   );
 
   return (
-    <div className="space-y-8 pb-12">
-      {/* Header */}
+    <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#222] pb-6">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tighter uppercase mb-1">CRM: Funil de Vendas</h1>
-          <p className="text-gray-500 text-sm">Clique no card para avançar o lead para a próxima etapa.</p>
+          <h1 className="text-3xl font-black text-white tracking-tighter uppercase mb-1 flex items-center gap-3">
+             <div className="w-8 h-8 rounded-xl bg-brand-neon flex items-center justify-center text-black font-black">C</div>
+             CRM de Vendas
+          </h1>
+          <p className="text-gray-500 text-sm">Arraste os cards para avançar no funil ou edite os detalhes.</p>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 px-6 py-2.5 bg-brand-neon text-black font-black rounded-xl text-sm hover:shadow-[0_0_20px_rgba(1,250,164,0.3)] transition-all">
+        <button onClick={() => { setEditLead(null); setIsModalOpen(true); }} className="flex items-center gap-2 px-6 py-2.5 bg-brand-neon text-black font-black rounded-xl text-sm hover:scale-105 transition-all">
           <Plus className="w-4 h-4" /> Novo Lead
         </button>
       </div>
 
-      {loading ? (
-        <div className="h-[50vh] flex items-center justify-center"><Loader2 className="w-10 h-10 text-brand-neon animate-spin" /></div>
-      ) : (
-        <div className="flex gap-6 overflow-x-auto pb-8 custom-scrollbar min-h-[70vh]">
-          {COLUMNS.map(col => (
-            <div key={col} className="w-[300px] shrink-0 bg-brand-darker/50 p-4 rounded-3xl border border-white/5">
-               <div className="flex items-center justify-between mb-6 px-1">
+      <div className="flex gap-6 overflow-x-auto pb-10 custom-scrollbar min-h-[75vh]">
+         {COLUMNS.map(col => (
+            <div key={col} 
+              onDragOver={(e) => e.preventDefault()} 
+              onDrop={(e) => handleDrop(e, col)}
+              className="w-[300px] shrink-0 space-y-4"
+            >
+               <div className="flex items-center justify-between px-2">
                   <div className="flex items-center gap-3">
-                     <span className={`w-3 h-3 rounded-full ${COLUMN_COLORS[col]} shadow-[0_0_10px_rgba(0,0,0,0.5)]`}></span>
-                     <h3 className="text-[10px] font-black uppercase text-white tracking-[0.2em]">{col}</h3>
-                     <span className="text-[10px] font-bold text-gray-600 bg-black/50 px-2 py-0.5 rounded-full border border-white/5">
-                       {leads.filter(l => l.status === col).length}
+                     <span className={`w-2.5 h-2.5 rounded-full ${COLUMN_COLORS[col]} shadow-[0_0_10px_rgba(0,0,0,1)]`}></span>
+                     <h3 className="text-[11px] font-black uppercase text-white tracking-[0.2em]">{col}</h3>
+                     <span className="text-[9px] font-bold text-gray-600 bg-black/50 px-2.5 py-0.5 rounded-full border border-white/5">
+                        {leads.filter(l => l.status === col).length}
                      </span>
                   </div>
                </div>
-
-               <div className="space-y-4">
+               <div className="space-y-4 min-h-[500px] bg-brand-darker/20 rounded-[2rem] p-1 border border-white/5">
                   {leads.filter(l => l.status === col).map(renderCard)}
-                  {leads.filter(l => l.status === col).length === 0 && (
-                     <div className="h-32 border-2 border-dashed border-[#222] rounded-3xl flex items-center justify-center text-gray-700 text-[10px] tracking-[0.3em] font-black uppercase">
-                        Vazio
-                     </div>
-                  )}
                </div>
             </div>
-          ))}
-        </div>
-      )}
+         ))}
+      </div>
 
-      {/* Modal Novo Lead */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-           <div className="bg-[#111] border border-[#222] w-full max-w-lg rounded-[2.5rem] p-10 space-y-8 animate-in zoom-in duration-300 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+           <div className="bg-[#111] border border-[#222] w-full max-w-lg rounded-[2.5rem] p-10 space-y-8 animate-in zoom-in duration-300">
               <div className="flex items-center justify-between">
-                 <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Capturar Lead</h2>
+                 <h2 className="text-2xl font-black text-white uppercase tracking-tighter">{editLead ? 'Editar Lead' : 'Captação Manual'}</h2>
                  <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white"><X className="w-6 h-6" /></button>
               </div>
-              <form onSubmit={handleAddLead} className="space-y-5">
+              <form onSubmit={handleSaveLead} className="space-y-5">
                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest pl-1">Nome</label>
-                       <input required className="w-full bg-black border border-[#222] p-4 rounded-2xl text-sm text-white focus:border-brand-neon outline-none transition-all" value={newLead.nome} onChange={e => setNewLead({...newLead, nome: e.target.value})} />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest pl-1">Empresa</label>
-                       <input className="w-full bg-black border border-[#222] p-4 rounded-2xl text-sm text-white focus:border-brand-neon outline-none transition-all" value={newLead.empresa} onChange={e => setNewLead({...newLead, empresa: e.target.value})} />
-                    </div>
+                    <input placeholder="Nome" required className="w-full bg-black border border-[#222] p-4 rounded-xl text-sm text-white" value={editLead ? editLead.nome : newLead.nome} onChange={e => editLead ? setEditLead({...editLead, nome: e.target.value}) : setNewLead({...newLead, nome: e.target.value})} />
+                    <input placeholder="Empresa" className="w-full bg-black border border-[#222] p-4 rounded-xl text-sm text-white" value={editLead ? editLead.empresa : newLead.empresa} onChange={e => editLead ? setEditLead({...editLead, empresa: e.target.value}) : setNewLead({...newLead, empresa: e.target.value})} />
                  </div>
-                 <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest pl-1">E-mail</label>
-                       <input required type="email" className="w-full bg-black border border-[#222] p-4 rounded-2xl text-sm text-white focus:border-brand-neon outline-none transition-all" value={newLead.email} onChange={e => setNewLead({...newLead, email: e.target.value})} />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest pl-1">WhatsApp</label>
-                       <input required className="w-full bg-black border border-[#222] p-4 rounded-2xl text-sm text-white focus:border-brand-neon outline-none transition-all" value={newLead.phone} onChange={e => setNewLead({...newLead, phone: e.target.value})} />
-                    </div>
-                 </div>
-                 <button disabled={saving} className="w-full bg-brand-neon p-5 rounded-2xl text-black font-black uppercase tracking-[0.2em] text-xs hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-brand-neon/20">
-                    {saving ? 'Gravando Lead...' : 'Cadastrar na Base'}
+                 <input placeholder="E-mail" type="email" className="w-full bg-black border border-[#222] p-4 rounded-xl text-sm text-white" value={editLead ? editLead.email : newLead.email} onChange={e => editLead ? setEditLead({...editLead, email: e.target.value}) : setNewLead({...newLead, email: e.target.value})} />
+                 <input placeholder="WhatsApp" className="w-full bg-black border border-[#222] p-4 rounded-xl text-sm text-white" value={editLead ? editLead.phone : newLead.phone} onChange={e => editLead ? setEditLead({...editLead, phone: e.target.value}) : setNewLead({...newLead, phone: e.target.value})} />
+                 <textarea placeholder="Observações" className="w-full bg-black border border-[#222] p-4 rounded-xl text-sm text-white h-24 rounded-2xl" value={editLead ? editLead.message : newLead.message} onChange={e => editLead ? setEditLead({...editLead, message: e.target.value}) : setNewLead({...newLead, message: e.target.value})} />
+                 <button className="w-full bg-brand-neon p-5 rounded-2xl text-black font-black uppercase tracking-[0.2em] text-xs hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-brand-neon/20">
+                    {editLead ? 'Salvar Lead' : 'Cadastrar na Base'}
                  </button>
               </form>
            </div>

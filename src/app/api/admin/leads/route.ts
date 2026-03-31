@@ -12,7 +12,7 @@ export async function GET() {
   return NextResponse.json(data);
 }
 
-// POST: Cria um novo lead (Manual do Admin)
+// POST: Cria um novo lead
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -31,15 +31,17 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PATCH: Atualiza o status de um lead (Arrastar no Kanban)
+// PATCH: Atualiza QUALQUER campo do lead (Edição Completa + Kanban)
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, status } = body;
+    const { id, ...updates } = body;
+
+    if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
     const { data, error } = await supabase
       .from('leads')
-      .update({ status })
+      .update(updates)
       .eq('id', id)
       .select()
       .single();

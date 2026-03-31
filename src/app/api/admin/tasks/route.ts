@@ -31,15 +31,17 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PATCH: Atualiza o status de uma tarefa
+// PATCH: Atualiza QUALQUER campo da tarefa (Draggable + Edição)
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, status } = body;
+    const { id, ...updates } = body;
+
+    if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
     const { data, error } = await supabase
       .from('tasks')
-      .update({ status })
+      .update(updates)
       .eq('id', id)
       .select()
       .single();

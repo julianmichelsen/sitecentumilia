@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import Image from "next/image";
-import { Menu, X, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Menu, X, Zap } from "lucide-react";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,88 +11,64 @@ export default function Header() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navLinks = [
-    { name: "Soluções", href: "/#solucoes" },
-    { name: "Metodologia", href: "/#metodologia" },
-    { name: "Cases", href: "/cases" },
+    { name: "Cases", href: "/#cases" },
+    { name: "Metodologia", href: "/metodologia" },
     { name: "Blog", href: "/blog" },
+    { name: "Admin", href: "/admin" },
   ];
 
   return (
-    <header className={`sticky top-0 z-50 w-full transition-all duration-300 border-b ${scrolled ? 'bg-brand-darker/90 backdrop-blur-xl border-brand-dark py-2 shadow-2xl' : 'bg-transparent border-transparent py-4'}`}>
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+    <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 ${scrolled ? 'py-4' : 'py-8'}`}>
+      <div className={`container mx-auto px-6 h-16 flex items-center justify-between rounded-[2rem] transition-all duration-700 border border-white/5 ${scrolled ? 'glass-elite bg-black/60 shadow-[0_0_30px_rgba(0,0,0,0.5)] mx-auto w-[95%] md:w-[90%]' : 'bg-transparent border-transparent'}`}>
         <Link href="/" className="flex items-center gap-2 group">
-          <Image 
-            src="/logo.png" 
-            alt="Centumilia" 
-            width={180} 
-            height={40} 
-            className="w-auto h-8 md:h-10 transition-transform group-hover:scale-105" 
-            priority
-          />
+          <div className="w-10 h-10 bg-brand-neon rounded-xl flex items-center justify-center text-black shadow-brand-neon/20 transition-all group-hover:scale-110">
+             <Zap className="w-5 h-5 fill-black" />
+          </div>
+          <span className="text-xl font-black italic tracking-tighter uppercase text-white group-hover:text-brand-neon transition-colors">Centumilia.</span>
         </Link>
-        
-        <nav className="hidden md:flex gap-8 items-center">
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-10">
           {navLinks.map((link) => (
             <Link 
               key={link.name} 
               href={link.href} 
-              className={`text-sm font-bold tracking-wide transition-all relative group py-2 
-                ${pathname === link.href ? 'text-brand-neon' : 'text-gray-400 hover:text-white'}`}
+              className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 hover:text-brand-neon transition-all hover:translate-y-[-1px]"
             >
               {link.name}
-              <span className={`absolute bottom-0 left-0 h-[2px] bg-brand-neon transition-all duration-300 
-                ${pathname === link.href ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
             </Link>
           ))}
-          <Link 
-            href="/contato" 
-            className="ml-4 inline-flex h-11 items-center justify-center rounded-full bg-transparent border-2 border-brand-neon/30 px-6 py-2 text-sm font-black text-brand-neon transition-all hover:bg-brand-neon hover:text-brand-darker hover:border-brand-neon hover:shadow-[0_0_15px_rgba(1,250,164,0.3)] focus-visible:outline-none"
-          >
-            Falar com Especialista
-          </Link>
+          <Link href="/contato" className="btn-epic-neon py-2.5 px-6 scale-90">Diagnóstico</Link>
         </nav>
 
-        {/* Mobile menu button */}
-        <button 
-          className="md:hidden p-2 text-brand-neon transition-colors"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle Menu"
-        >
-          {isOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
+        {/* Mobile Toggle */}
+        <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-white p-2">
+          {isOpen ? <X /> : <Menu />}
         </button>
       </div>
 
-      {/* Mobile Navigation */}
-      <div className={`md:hidden fixed inset-x-0 top-[72px] bg-brand-dark/95 backdrop-blur-2xl border-b border-brand-dark overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[400px] opacity-100 shadow-2xl' : 'max-h-0 opacity-0'}`}>
-        <nav className="flex flex-col p-6 space-y-5">
-          {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              href={link.href} 
-              onClick={() => setIsOpen(false)} 
-              className="text-lg font-bold text-gray-300 hover:text-brand-neon flex items-center justify-between group"
-            >
-              {link.name}
-              <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
-            </Link>
-          ))}
-          <Link 
-            href="/contato" 
-            onClick={() => setIsOpen(false)}
-            className="inline-flex h-14 items-center justify-center rounded-xl bg-brand-neon px-6 text-base font-black text-brand-darker shadow-lg active:scale-95 transition-transform"
-          >
-            Falar com Especialista
-          </Link>
-        </nav>
-      </div>
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div className="fixed inset-0 z-[-1] bg-black/95 backdrop-blur-3xl flex flex-col items-center justify-center gap-10 animate-in fade-in duration-500">
+           {navLinks.map((link) => (
+              <Link 
+                key={link.name} 
+                href={link.href} 
+                onClick={() => setIsOpen(false)}
+                className="text-3xl font-black italic uppercase tracking-tighter text-white hover:text-brand-neon"
+              >
+                {link.name}
+              </Link>
+           ))}
+           <Link href="/contato" onClick={() => setIsOpen(false)} className="btn-epic-neon mt-10">Falar com Especialista</Link>
+        </div>
+      )}
     </header>
   );
 }

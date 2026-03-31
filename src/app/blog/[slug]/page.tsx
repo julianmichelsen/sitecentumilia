@@ -1,6 +1,7 @@
 import { getPostBySlug, getPostSlugs } from '@/lib/markdown';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -32,9 +33,21 @@ export default async function BlogPost({ params }: { params: { slug: string } })
         </Link>
         
         <header className="space-y-4 border-b border-brand-dark pb-10">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter text-white">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight">
             {post.title}
           </h1>
+
+          {post.coverImage && (
+            <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-brand-dark mb-12 group">
+              <Image 
+                src={post.coverImage} 
+                alt={post.title} 
+                fill 
+                className="object-cover"
+                priority
+              />
+            </div>
+          )}
           <div className="flex items-center gap-2 text-brand-cyan pt-4">
             <Calendar className="h-4 w-4" />
             <time dateTime={post.date}>

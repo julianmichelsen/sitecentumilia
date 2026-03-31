@@ -16,6 +16,8 @@ import {
 import { getAllPosts } from "@/lib/markdown";
 import { getLogos, getTestimonials, getConfig } from "@/lib/content";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const latestCases = (await getAllPosts("cases")).slice(0, 3);
   const latestBlog = (await getAllPosts("blog")).slice(0, 3);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Plus, Pencil, Trash2, Save, X, ArrowLeft, FileText } from 'lucide-react';
 
@@ -22,7 +22,7 @@ const emptyPostData: PostData = {
   content: '',
 };
 
-export default function AdminBlog() {
+function AdminBlogContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [posts, setPosts] = useState<PostData[]>([]);
@@ -224,5 +224,17 @@ export default function AdminBlog() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AdminBlog() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-2 border-[#01FAA4]/30 border-t-[#01FAA4] rounded-full animate-spin" />
+      </div>
+    }>
+      <AdminBlogContent />
+    </Suspense>
   );
 }

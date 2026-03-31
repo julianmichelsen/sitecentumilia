@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Plus, Pencil, Trash2, Save, X, ArrowLeft, Briefcase } from 'lucide-react';
 
@@ -28,7 +28,7 @@ const emptyCaseData: CaseData = {
   services: '', challenge: '', strategy: '', results: '', metrics: '', content: '',
 };
 
-export default function AdminCases() {
+function AdminCasesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [cases, setCases] = useState<CaseData[]>([]);
@@ -276,5 +276,17 @@ export default function AdminCases() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AdminCases() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-2 border-[#01FAA4]/30 border-t-[#01FAA4] rounded-full animate-spin" />
+      </div>
+    }>
+      <AdminCasesContent />
+    </Suspense>
   );
 }

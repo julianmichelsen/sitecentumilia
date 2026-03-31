@@ -91,10 +91,11 @@ function AdminCasesContent() {
       const data = await res.json();
       if (data.url) {
         setEditing({ ...editing, coverImage: data.url });
-        setMessage('Imagem enviada com sucesso!');
-        setTimeout(() => setMessage(''), 3000);
+        setMessage('Imagem enviada!');
+      } else {
+        setMessage(`Erro: ${data.error || 'Falha no upload'}`);
       }
-    } catch (err) { setMessage('Erro no upload'); }
+    } catch (err) { setMessage('Erro de conexão ou servidor'); }
     finally { setUploading(false); }
   }
 

@@ -18,24 +18,30 @@ export async function POST(request: NextRequest) {
     const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
     const filePath = `uploads/${fileName}`;
 
-    // Upload para o Supabase Storage (Bucket 'media')
+    // Tenta o upload
     const { data, error } = await supabase.storage
       .from('media')
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
 
     if (error) {
-      console.error('Erro no Storage:', error);
-      return NextResponse.json({ error: 'Erro no upload para o banco' }, { status: 500 });
+       // Se der erro aqui, é provável que o bucket 'media' não exista ou não seja público
+       console.error('Erro Supabase Storage:', error);
+       return NextResponse.json({ 
+         error: `Erro no banco: ${error.message}. Verifique se o bucket 'media' foi criado no Supabase.`,
+         details: error 
+       }, { status: 500 });
     }
 
-    // Gerar a URL pública
     const { data: { publicUrl } } = supabase.storage
       .from('media')
       .getPublicUrl(filePath);
 
     return NextResponse.json({ url: publicUrl });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: 'Erro interno ao processar upload' }, { status: 500 });
+  } catch (err: any) {
+    console.error('Erro interno:', err);
+    return NextResponse.json({ error: err.message || 'Erro interno no servidor' }, { status: 500 });
   }
 }

@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Asqui Imports",
+    "logo": "/logos/asqui.png",
+    "order": 1
+  },
+  {
+    "name": "Forte Estruturas",
+    "logo": "/logos/forte-estruturas.png",
+    "order": 2
+  },
+  {
+    "name": "Boito",
+    "logo": "/logos/boito.png",
+    "order": 3
+  },
+  {
+    "name": "Invista",
+    "logo": "/logos/invista.png",
+    "order": 4
+  },
+  {
+    "name": "Petros",
+    "logo": "/logos/petros.png",
+    "order": 5
+  },
+  {
+    "name": "Peretti",
+    "logo": "/logos/peretti.png",
+    "order": 6
+  },
+  {
+    "name": "SaperX",
+    "logo": "/logos/saperx.png",
+    "order": 7
+  },
+  {
+    "name": "Horizontes",
+    "logo": "/logos/horizontes.png",
+    "order": 8
+  }
+]

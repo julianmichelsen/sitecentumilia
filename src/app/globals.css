@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #161616;
+  }
+
+  /* Emulando o dark mode como padrão premium conforme breifing */
+  body {
+    @apply bg-brand-darker text-white;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Base styling for headers until fonts are ready */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold tracking-tight;
+}
+
+/* Custom glow effect */
+.hover-glow:hover {
+  box-shadow: 0 0 15px rgba(1, 250, 164, 0.4);
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "quote": "A Centumilia mudou nossa perspectiva de vendas. Paramos de postar sem sentido e passamos a fazer um trabalho orientado à geração de leads e CRM.",
+    "author": "Cliente B2B",
+    "role": "Indústria de Logística",
+    "rating": 5,
+    "order": 1
+  },
+  {
+    "id": "2",
+    "quote": "Finalmente uma agência que liga as ações com o nosso faturamento. O ROAS subiu 45% nos últimos meses de operação.",
+    "author": "E-commerce Direto",
+    "role": "Varejo de Moda",
+    "rating": 5,
+    "order": 2
+  },
+  {
+    "id": "3",
+    "quote": "Tínhamos muita dificuldade em captar novos pacientes na clínica. Com o framework CENTUM estamos com a agenda cheia na semana inteira.",
+    "author": "Serviços Médicos",
+    "role": "Clínica Local",
+    "rating": 5,
+    "order": 3
+  }
+]

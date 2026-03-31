@@ -1,0 +1,42 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { isAuthenticated } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
+
+export async function GET() {
+  if (!isAuthenticated()) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+  }
+  const { data, error } = await supabase.from('config').select('*').single();
+  if (error) return NextResponse.json({ siteName: 'Centumilia' });
+  return NextResponse.json({
+    siteName: data.site_name,
+    tagline: data.tagline,
+    phone: data.phone,
+    whatsapp: data.whatsapp,
+    email: data.email,
+    location: data.location,
+    instagram: data.instagram,
+    linkedin: data.linkedin
+  });
+}
+
+export async function POST(request: NextRequest) {
+  if (!isAuthenticated()) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+  }
+  const body = await request.json();
+  const dbData = {
+    id: 1,
+    site_name: body.siteName,
+    tagline: body.tagline,
+    phone: body.phone,
+    whatsapp: body.whatsapp,
+    email: body.email,
+    location: body.location,
+    instagram: body.instagram,
+    linkedin: body.linkedin
+  };
+  const { error } = await supabase.from('config').upsert(dbData);
+  if (error) return NextResponse.json({ error: 'Erro ao salvar' }, { status: 500 });
+  return NextResponse.json({ success: true });
+}

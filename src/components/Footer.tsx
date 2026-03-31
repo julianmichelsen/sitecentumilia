@@ -10,13 +10,14 @@ export default function Footer() {
       <div className="container px-6 md:px-12 mx-auto relative z-10">
         <div className="grid gap-16 lg:grid-cols-5 xl:grid-cols-6 mb-20">
           <div className="lg:col-span-2 space-y-8">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative h-8 w-32 md:h-10 transition-all duration-500 group-hover:scale-105 opacity-90 brightness-0 invert">
+            <Link href="/" className="flex items-center gap-3 group px-4">
+              <div className="relative transition-all duration-500 group-hover:scale-105">
                  <Image 
                     src="/logo.png" 
                     alt="Centumilia Logo" 
-                    fill
-                    className="object-contain"
+                    width={220}
+                    height={50}
+                    className="w-auto h-12 object-contain"
                  />
               </div>
             </Link>

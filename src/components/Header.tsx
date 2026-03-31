@@ -28,17 +28,15 @@ export default function Header() {
     <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 ${scrolled ? 'py-4' : 'py-8'}`}>
       <div className={`container mx-auto px-6 h-16 flex items-center justify-between rounded-[2rem] transition-all duration-700 border border-white/5 ${scrolled ? 'glass-elite bg-black/60 shadow-[0_0_30px_rgba(0,0,0,0.5)] mx-auto w-[95%] md:w-[90%]' : 'bg-transparent border-transparent'}`}>
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative h-8 w-auto md:h-10 transition-all duration-500 group-hover:scale-105">
+          <div className="relative transition-all duration-500 group-hover:scale-105">
              <Image 
                 src="/logo.png" 
                 alt="Centumilia Logo" 
-                layout="fill"
-                className="object-contain brightness-0 invert"
+                width={180} 
+                height={40} 
+                className="w-auto h-8 md:h-10 object-contain"
+                priority
              />
-             {/* Fallback typography for extra authority */}
-             <div className="flex h-full items-center opacity-0 group-hover:opacity-100 transition-opacity absolute left-0 top-0">
-                <span className="text-xl font-black italic tracking-tighter uppercase text-brand-neon">Centumilia.</span>
-             </div>
           </div>
         </Link>
 

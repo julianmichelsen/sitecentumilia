@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateStaticParams() {
   const posts = await getPostSlugs('blog');
   return posts.map((post) => ({

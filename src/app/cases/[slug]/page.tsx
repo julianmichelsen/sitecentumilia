@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { ArrowLeft, Trophy, MapPin, Calendar, Briefcase, Target, Quote, TrendingUp, Layers } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateStaticParams() {
   const cases = await getPostSlugs('cases');
   return cases.map((slug) => ({

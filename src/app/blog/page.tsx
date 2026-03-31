@@ -2,6 +2,13 @@ import Link from 'next/link';
 import { getAllPosts } from '@/lib/markdown';
 import { ArrowRight, Calendar } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
+export async function generateStaticParams() {
+  const posts = await getAllPosts('blog');
+  return posts.map((post) => ({ slug: post.slug }));
+}
+
 export default async function BlogList() {
   const posts = await getAllPosts('blog');
 

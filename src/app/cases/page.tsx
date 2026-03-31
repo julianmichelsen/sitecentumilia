@@ -2,6 +2,13 @@ import Link from 'next/link';
 import { getAllPosts } from '@/lib/markdown';
 import { ArrowRight, Trophy } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
+export async function generateStaticParams() {
+  const cases = await getAllPosts('cases');
+  return cases.map((post) => ({ slug: post.slug }));
+}
+
 export default async function CasesList() {
   const cases = await getAllPosts('cases');
 

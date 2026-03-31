@@ -11,12 +11,12 @@ import {
   CheckCircle2,
   Users,
   Play,
-  Zap
+  Zap,
+  BookOpen,
+  ArrowUpRight
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import { getAllPosts } from "@/lib/markdown";
 import { getLogos, getTestimonials, getConfig } from "@/lib/content";
@@ -26,16 +26,42 @@ export const revalidate = 0;
 
 export default async function Home() {
   const cases = await getAllPosts("cases");
-  const latestCases = cases.slice(0, 3);
-  const latestBlog = (await getAllPosts("blog")).slice(0, 3);
+  // Filtrando mocks e garantindo Asqui Imports no topo
+  const realCases = cases
+    .filter((c: any) => c.title !== "TESTE11" && !c.title.includes("Lorem"))
+    .sort((a: any, b: any) => a.title === "Asqui Imports" ? -1 : 1);
+  
+  const latestCases = realCases.slice(0, 3);
   const logos = (await getLogos()).sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
-  const testimonials = await getTestimonials();
   const config = await getConfig();
+
+  // Depoimentos Reais fornecidos pelo usuário
+  const realTestimonials = [
+    {
+      id: '1',
+      author: 'Asqui Imports',
+      role: 'Importação B2B',
+      quote: 'A Centumilia organizou nossa demanda de forma previsível. O trabalho focado em tráfego e posicionamento profissionalizou nossa captação.',
+      rating: 5
+    },
+    {
+      id: '2',
+      author: 'Unius Logística',
+      role: 'Estratégia & Operação',
+      quote: 'Ter a operação comercial alinhada com as campanhas faz toda a diferença. Não são apenas posts, é estratégia focada em contatos reais.',
+      rating: 5
+    },
+    {
+      id: '3',
+      author: 'Invista Imóveis',
+      role: 'Setor Imobiliário',
+      quote: 'Uma agência que entende que o resultado final tem que ser faturamento, otimizando nossos recursos para gerar leads qualificados.',
+      rating: 5
+    }
+  ];
 
   return (
     <div className="flex min-h-screen flex-col bg-brand-darker relative overflow-hidden">
-      <Header />
-      
       {/* Animated Mesh Gradients Background (Organic Life) */}
       <div className="fixed inset-0 -z-10 pointer-events-none opacity-30 select-none">
          <div className="gradient-blob w-[600px] h-[600px] bg-brand-neon top-[-10%] right-[-10%]" style={{ animationDelay: '0s' }}></div>
@@ -54,7 +80,8 @@ export default async function Home() {
             </Reveal>
             
             <Reveal className="stagger-1">
-               <h1 className="text-5xl font-black tracking-tighter text-white md:text-8xl lg:text-[7rem] italic uppercase leading-[0.9] mb-6">
+               {/* AJUSTE: leading-[1.15] para evitar corte tipográfico */}
+               <h1 className="text-5xl font-black tracking-tighter text-white md:text-8xl lg:text-[7rem] italic uppercase leading-[1.15] mb-6">
                  Pare de depender do <span className="text-gradient">improviso</span>.<br />
                  Comece a viver de <span className="text-gradient" style={{ animationDelay: '-2s' }}>processo</span>.
                </h1>
@@ -113,12 +140,12 @@ export default async function Home() {
               </Reveal>
             </div>
             
-            {/* Logos de Clientes Atendidos */}
+            {/* Logos de Clientes Atendidos - AJUSTE: Copy Ética e Opacidade */}
             <Reveal className="mt-40 stagger-3">
-              <p className="text-center text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] mb-16">Empresas que confiam na Centumilia</p>
-              <div className="flex flex-wrap justify-center gap-16 md:gap-24 opacity-30 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-700">
+              <p className="text-center text-[10px] font-black text-white/40 uppercase tracking-[0.4em] mb-16">Marcas que já passaram pelo nosso método</p>
+              <div className="flex flex-wrap justify-center gap-16 md:gap-24 opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-opacity duration-700">
                 {logos.length > 0 ? logos.map((client: any, i: number) => (
-                  <div key={i} className="relative h-10 w-32 flex items-center justify-center hover:scale-110 transition-transform">
+                  <div key={i} className="relative h-8 w-32 flex items-center justify-center hover:scale-110 transition-transform">
                     <Image
                       src={client.logo}
                       alt={client.name}
@@ -127,7 +154,7 @@ export default async function Home() {
                     />
                   </div>
                 )) : (
-                  <p className="col-span-5 text-gray-600 text-xs italic">Nenhum parceiro cadastrado.</p>
+                  <p className="col-span-5 text-gray-600 text-[10px] uppercase font-black tracking-widest italic animate-pulse">Atualizando Autoridade...</p>
                 )}
               </div>
             </Reveal>
@@ -200,8 +227,8 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Cases de Sucesso */}
-        <section className="w-full py-40 border-b border-white/5">
+        {/* Cases de Sucesso - AJUSTE: Asqui Imports no Topo */}
+        <section id="cases" className="w-full py-40 border-b border-white/5">
           <div className="container px-4 md:px-6 mx-auto space-y-24">
             <Reveal className="flex flex-col md:flex-row items-center justify-between gap-10">
               <div className="space-y-4">
@@ -238,8 +265,8 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Prova Social */}
-        <section className="py-40 bg-black/40 relative">
+        {/* Prova Social - AJUSTE: Depoimentos Reais */}
+        <section className="py-40 bg-black/40 relative border-b border-white/5">
            <div className="container mx-auto px-4 space-y-24 relative z-10 text-center">
               <Reveal>
                  <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase italic">O que dizem os <br/><span className="text-gradient">Sócios.</span></h2>
@@ -247,7 +274,7 @@ export default async function Home() {
               </Reveal>
 
               <div className="grid gap-10 md:grid-cols-3">
-                 {testimonials.map((t: any, i: number) => (
+                 {realTestimonials.map((t: any, i: number) => (
                     <Reveal key={t.id} className={`stagger-${i+1}`}>
                        <div className="glass-elite p-12 rounded-[4rem] space-y-8 hover:border-brand-neon/20 transition-all group h-full flex flex-col justify-between text-left">
                           <div className="text-brand-neon flex gap-1">
@@ -268,9 +295,29 @@ export default async function Home() {
            </div>
         </section>
 
+        {/* NOVA SEÇÃO: Escola Centum */}
+        <section className="py-32 bg-transparent">
+           <div className="container mx-auto px-4">
+              <Reveal className="glass-elite rounded-[4rem] p-12 md:p-20 border border-white/5 flex flex-col md:flex-row items-center justify-between gap-12 relative overflow-hidden group">
+                 <div className="absolute top-0 right-0 w-96 h-96 bg-brand-purple/5 blur-[100px] group-hover:bg-brand-purple/10 transition-all rounded-full translate-x-1/2 -translate-y-1/2"></div>
+                 <div className="space-y-6 text-center md:text-left relative z-10">
+                    <div className="flex items-center gap-3 w-fit mx-auto md:mx-0 bg-brand-purple/10 px-4 py-2 rounded-full border border-brand-purple/20">
+                       <BookOpen className="w-4 h-4 text-brand-purple" />
+                       <span className="text-[10px] font-black uppercase tracking-widest text-brand-purple">Projeto Educacional</span>
+                    </div>
+                    <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter text-white uppercase leading-none">Conheça também a <br/><span className="text-brand-purple">Escola Centum.</span></h2>
+                    <p className="max-w-xl text-gray-400 text-lg leading-relaxed">Nossa frente educacional e ecossistema de negócios para empreendedores que desejam dominar o próprio crescimento e parar de depender do improviso.</p>
+                 </div>
+                 <Link href="#" className="btn-epic glass-elite py-5 px-10 text-[11px] tracking-[0.3em] font-black flex items-center gap-3 hover:bg-brand-purple hover:text-white transition-all relative z-10 group-hover:scale-105">
+                    SABER MAIS <ArrowUpRight className="w-4 h-4" />
+                 </Link>
+              </Reveal>
+           </div>
+        </section>
+
         {/* CTA Final */}
-        <section className="relative py-60 px-4 overflow-hidden text-center">
-           <Reveal className="container mx-auto max-w-5xl glass-elite rounded-[4rem] p-12 md:p-24 flex flex-col items-center justify-center space-y-12 relative group shadow-brand-neon/10">
+        <section className="relative py-40 px-4 overflow-hidden text-center">
+           <Reveal className="container mx-auto max-w-5xl glass-elite rounded-[4rem] p-12 md:p-24 flex flex-col items-center justify-center space-y-12 relative group shadow-brand-neon/10 border-brand-neon/20 border">
               <div className="absolute inset-0 bg-brand-neon/10 opacity-0 group-hover:opacity-100 transition-opacity blur-[100px]"></div>
               <h2 className="text-5xl md:text-8xl font-black text-white italic tracking-tighter uppercase leading-[0.8] relative z-10 mb-4 transition-transform group-hover:scale-105 duration-700">
                 A HORA DA <br/> <span className="text-gradient">ESCALA</span> É AGORA.
@@ -282,8 +329,6 @@ export default async function Home() {
            </Reveal>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

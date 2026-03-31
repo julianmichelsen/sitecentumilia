@@ -22,11 +22,11 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(data);
 }
 
-// POST: Envia um novo criativo para aprovação
+// POST: Envia um novo criativo
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { client_id, title, media_url, caption, scheduled_at } = body;
+    const { client_id, title, media_url, caption, status, scheduled_at } = body;
 
     const { data, error } = await supabase
       .from('content_posts')
@@ -35,8 +35,8 @@ export async function POST(request: NextRequest) {
         title, 
         media_url, 
         caption, 
+        status: status || 'Em Análise',
         scheduled_at: scheduled_at || null, 
-        status: 'Em Análise',
         magic_link: crypto.randomUUID()
       }])
       .select()
@@ -49,13 +49,12 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PATCH: Edição COMPLETA do post de aprovação
+// PATCH: Atualiza post
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const { id, magic_link, ...updates } = body;
 
-    // Se temos magic_link mas não id (vindo do portal do cliente)
     if (!id && magic_link) {
       const { data, error } = await supabase
         .from('content_posts')
@@ -67,7 +66,6 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json(data);
     }
 
-    // Se temos ID (vindo do painel admin)
     if (id) {
        const { data, error } = await supabase
         .from('content_posts')
@@ -80,6 +78,26 @@ export async function PATCH(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'ID or Magic Link is required' }, { status: 400 });
+  } catch (err) {
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+  }
+}
+
+// DELETE: Remove um post
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+
+    const { error } = await supabase
+      .from('content_posts')
+      .delete()
+      .eq('id', id);
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true });
   } catch (err) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }

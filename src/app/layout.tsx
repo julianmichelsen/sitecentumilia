@@ -10,14 +10,31 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const syne = Syne({ subsets: ["latin"], variable: "--font-syne" });
 
 export const metadata: Metadata = {
-  title: "Centumilia | Agência de Marketing por Performance",
-  description: "A Centumilia transforma marketing em um sistema de aquisição, posicionamento e crescimento para empresas que não querem mais depender do improviso.",
-  keywords: ["marketing digital", "performance", "growth marketing", "b2b", "leads"],
+  metadataBase: new URL('https://sitecentumilia.vercel.app'),
+  title: {
+    default: "Centumilia | Marketing com Método",
+    template: "%s | Centumilia"
+  },
+  description: "Transformamos marketing em um sistema previsível de aquisição, posicionamento e crescimento para empresas B2B e serviços.",
+  keywords: ["marketing digital", "performance", "growth marketing", "b2b", "leads", "estratégia de vendas"],
   openGraph: {
     title: "Centumilia | Marketing com Método",
     description: "Crescimento com direção. Pare de depender do improviso na sua empresa.",
+    url: "https://sitecentumilia.vercel.app",
+    siteName: "Centumilia",
+    images: [
+      {
+        url: "/og-image.png", // Imagem padrão de compartilhamento
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "pt-BR",
     type: "website",
-    locale: "pt_BR",
+  },
+  robots: {
+    index: true,
+    follow: true,
   }
 };
 

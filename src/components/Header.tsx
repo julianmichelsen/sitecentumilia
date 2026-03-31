@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Zap } from "lucide-react";
+import Image from "next/image";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,11 +27,19 @@ export default function Header() {
   return (
     <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 ${scrolled ? 'py-4' : 'py-8'}`}>
       <div className={`container mx-auto px-6 h-16 flex items-center justify-between rounded-[2rem] transition-all duration-700 border border-white/5 ${scrolled ? 'glass-elite bg-black/60 shadow-[0_0_30px_rgba(0,0,0,0.5)] mx-auto w-[95%] md:w-[90%]' : 'bg-transparent border-transparent'}`}>
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 bg-brand-neon rounded-xl flex items-center justify-center text-black shadow-brand-neon/20 transition-all group-hover:scale-110">
-             <Zap className="w-5 h-5 fill-black" />
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative h-8 w-auto md:h-10 transition-all duration-500 group-hover:scale-105">
+             <Image 
+                src="/logo.png" 
+                alt="Centumilia Logo" 
+                layout="fill"
+                className="object-contain brightness-0 invert"
+             />
+             {/* Fallback typography for extra authority */}
+             <div className="flex h-full items-center opacity-0 group-hover:opacity-100 transition-opacity absolute left-0 top-0">
+                <span className="text-xl font-black italic tracking-tighter uppercase text-brand-neon">Centumilia.</span>
+             </div>
           </div>
-          <span className="text-xl font-black italic tracking-tighter uppercase text-white group-hover:text-brand-neon transition-colors">Centumilia.</span>
         </Link>
 
         {/* Desktop Nav */}

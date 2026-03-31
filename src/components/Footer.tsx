@@ -10,11 +10,15 @@ export default function Footer() {
       <div className="container px-6 md:px-12 mx-auto relative z-10">
         <div className="grid gap-16 lg:grid-cols-5 xl:grid-cols-6 mb-20">
           <div className="lg:col-span-2 space-y-8">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 bg-brand-neon rounded-xl flex items-center justify-center text-black shadow-brand-neon/20 transition-all group-hover:scale-110">
-                 <span className="font-black italic tracking-tighter">C.</span>
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="relative h-8 w-32 md:h-10 transition-all duration-500 group-hover:scale-105 opacity-90 brightness-0 invert">
+                 <Image 
+                    src="/logo.png" 
+                    alt="Centumilia Logo" 
+                    fill
+                    className="object-contain"
+                 />
               </div>
-              <span className="text-xl font-black italic tracking-tighter uppercase text-white group-hover:text-brand-neon transition-colors">Centumilia.</span>
             </Link>
             <p className="max-w-xs text-sm text-gray-400 font-medium leading-relaxed italic">
               "Transformamos marketing em um sistema previsível de crescimento. Mais que tráfego, entregamos retorno real através do Método CENTUM."

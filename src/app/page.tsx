@@ -79,9 +79,9 @@ export default async function Home() {
                </span>
             </Reveal>
             
-            <Reveal className="stagger-1">
-               {/* AJUSTE: leading-[1.15] para evitar corte tipográfico */}
-               <h1 className="text-5xl font-black tracking-tighter text-white md:text-8xl lg:text-[7rem] italic uppercase leading-[1.15] mb-6">
+            <Reveal className="stagger-1 w-full overflow-visible py-4">
+               {/* AJUSTE: leading-[1.3] e overflow-visible para garantir que o 'P' e 'D' não cortem */}
+               <h1 className="text-5xl font-black tracking-tighter text-white md:text-8xl lg:text-[7rem] italic uppercase leading-[1.3] mb-6 drop-shadow-2xl">
                  Pare de depender do <span className="text-gradient">improviso</span>.<br />
                  Comece a viver de <span className="text-gradient" style={{ animationDelay: '-2s' }}>processo</span>.
                </h1>

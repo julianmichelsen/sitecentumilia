@@ -39,7 +39,7 @@ interface Client {
   name: string;
 }
 
-const CONTENT_COLUMNS = ['Em Produção', 'Aguardando Cliente', 'Aprovado', 'Ajuste Solicitado'];
+const CONTENT_COLUMNS = ['Em Análise', 'Em Produção', 'Aguardando Cliente', 'Aprovado', 'Ajuste Solicitado'];
 
 export default function ContentApprovalPage() {
   const [posts, setPosts] = useState<ContentPost[]>([]);

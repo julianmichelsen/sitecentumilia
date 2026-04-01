@@ -46,8 +46,11 @@ export default function AdminLogos() {
         body: formData,
       });
       const data = await res.json();
-      if (data.success) {
-        setNewLogo({ ...newLogo, logo: data.path });
+      if (data.url || data.path) {
+        setNewLogo({ ...newLogo, logo: data.url || data.path });
+        setMessage('Logo enviada!');
+      } else {
+        setMessage(data.error || 'Falha no upload');
       }
     } catch (err) {
       alert('Erro no upload');

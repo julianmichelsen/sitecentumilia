@@ -30,3 +30,7 @@ export async function POST(request: NextRequest) {
   if (error) return NextResponse.json({ error: 'Erro ao salvar' }, { status: 500 });
   return NextResponse.json({ success: true });
 }
+
+export async function PUT(request: NextRequest) {
+  return POST(request);
+}

@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       .from('media')
       .getPublicUrl(filePath);
 
-    return NextResponse.json({ url: publicUrl });
+    return NextResponse.json({ success: true, url: publicUrl, path: publicUrl });
   } catch (err: any) {
     console.error('Erro interno:', err);
     return NextResponse.json({ error: err.message || 'Erro interno no servidor' }, { status: 500 });

@@ -117,11 +117,43 @@ export default function ContentApprovalPage() {
      } catch (_) {}
   }
 
-  const copyLink = (link: string) => {
-    const url = `${window.location.origin}/p/${link}`;
-    navigator.clipboard.writeText(url);
-    setMessage('Link de Aprovação Copiado! 📤');
-    setTimeout(() => setMessage(''), 3000);
+  const generateMagicLink = () => {
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+      return crypto.randomUUID();
+    }
+
+    return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+  };
+
+  const ensureMagicLink = async (post: ContentPost) => {
+    if (post.magic_link) return post.magic_link;
+
+    const generated = generateMagicLink();
+    const res = await fetch('/api/admin/content', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: post.id, magic_link: generated }),
+    });
+
+    if (!res.ok) {
+      throw new Error('Falha ao gerar link');
+    }
+
+    setPosts((current) => current.map((item) => (item.id === post.id ? { ...item, magic_link: generated } : item)));
+    return generated;
+  };
+
+  const copyLink = async (post: ContentPost) => {
+    try {
+      const link = await ensureMagicLink(post);
+      const url = `${window.location.origin}/p/${link}`;
+      await navigator.clipboard.writeText(url);
+      setMessage('Link de Aprovação Copiado! 📤');
+    } catch (_) {
+      setMessage('Não foi possível copiar o link ❌');
+    } finally {
+      setTimeout(() => setMessage(''), 3000);
+    }
   };
 
   return (
@@ -162,9 +194,9 @@ export default function ContentApprovalPage() {
                               </button>
                            </div>
                            <div className="absolute bottom-5 left-5 right-5">
-                              <button onClick={() => copyLink(post.magic_link)} className="w-full btn-elite-outline glass-card py-2.5 flex items-center justify-center gap-3 backdrop-blur-3xl group-hover:bg-brand-neon group-hover:text-black group-hover:border-transparent transition-all">
-                                 <Copy className="w-3.5 h-3.5" /> LINK APROVAÇÃO
-                              </button>
+                               <button onClick={() => copyLink(post)} className="w-full btn-elite-outline glass-card py-2.5 flex items-center justify-center gap-3 backdrop-blur-3xl group-hover:bg-brand-neon group-hover:text-black group-hover:border-transparent transition-all">
+                                  <Copy className="w-3.5 h-3.5" /> LINK APROVAÇÃO
+                               </button>
                            </div>
                         </div>
                         <div className="p-6 space-y-2">

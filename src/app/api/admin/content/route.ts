@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { isAuthenticated } from '@/lib/auth';
 
 // GET: Lista todos os posts OU filtra por um magic_link específico
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const magicLink = searchParams.get('magic_link');
+
+  if (!magicLink && !isAuthenticated()) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+  }
 
   let query = supabase
     .from('content_posts')
@@ -25,6 +30,10 @@ export async function GET(request: NextRequest) {
 // POST: Envia um novo criativo
 export async function POST(request: NextRequest) {
   try {
+    if (!isAuthenticated()) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { client_id, title, media_url, caption, status, scheduled_at } = body;
 
@@ -35,7 +44,7 @@ export async function POST(request: NextRequest) {
         title, 
         media_url, 
         caption, 
-        status: status || 'Em Análise',
+        status: status || 'Aguardando Cliente',
         scheduled_at: scheduled_at || null, 
         magic_link: crypto.randomUUID()
       }])
@@ -53,7 +62,24 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, magic_link, ...updates } = body;
+    const { id, magic_link, ...payloadUpdates } = body;
+    const isAdmin = isAuthenticated();
+    let updates = payloadUpdates;
+
+    if (!id && !magic_link) {
+      return NextResponse.json({ error: 'ID or Magic Link is required' }, { status: 400 });
+    }
+
+    if (!isAdmin && !magic_link) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
+    if (!isAdmin && magic_link) {
+      updates = { status: payloadUpdates.status, feedback: payloadUpdates.feedback };
+      if (!updates.status) {
+        return NextResponse.json({ error: 'Status is required' }, { status: 400 });
+      }
+    }
 
     if (!id && magic_link) {
       const { data, error } = await supabase
@@ -86,6 +112,10 @@ export async function PATCH(request: NextRequest) {
 // DELETE: Remove um post
 export async function DELETE(request: NextRequest) {
   try {
+    if (!isAuthenticated()) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

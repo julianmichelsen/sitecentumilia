@@ -27,12 +27,47 @@ interface Post {
   scheduled_at: string;
 }
 
+const STATUS_PENDING = 'Aguardando Cliente';
+const STATUS_APPROVED = 'Aprovado';
+const STATUS_ADJUST = 'Ajuste Solicitado';
+const STATUS_PRODUCTION = 'Em Produção';
+
 export default function ClientApprovalPortal({ params }: { params: { id: string } }) {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<string>('');
   const [feedback, setFeedback] = useState('');
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+
+  const statusInfo = (() => {
+    if (!status || status === STATUS_PENDING) return null;
+
+    if (status === STATUS_APPROVED) {
+      return {
+        text: 'Criativo Aprovado com Sucesso ✅',
+        className: 'bg-green-500/10 text-green-500 border-green-500/20 shadow-[0_0_30px_rgba(34,197,94,0.1)]'
+      };
+    }
+
+    if (status === STATUS_ADJUST) {
+      return {
+        text: 'Ajustes Solicitados pelo Cliente ❌',
+        className: 'bg-red-500/10 text-red-500 border-red-500/20'
+      };
+    }
+
+    if (status === STATUS_PRODUCTION) {
+      return {
+        text: 'Criativo em produção. Você será avisado quando estiver pronto.',
+        className: 'bg-brand-cyan/10 text-brand-cyan border-brand-cyan/20'
+      };
+    }
+
+    return {
+      text: `Status atual: ${status}`,
+      className: 'bg-white/5 text-gray-300 border-white/10'
+    };
+  })();
 
   useEffect(() => {
     fetchPost();
@@ -98,13 +133,13 @@ export default function ClientApprovalPortal({ params }: { params: { id: string 
 
             <div className="aspect-square w-full bg-[#111] relative group cursor-zoom-in">
                <img src={post.media_url} alt="" className="w-full h-full object-cover" />
-               {status === 'Aprovado' && (
-                 <div className="absolute inset-0 bg-green-500/10 backdrop-blur-[2px] flex items-center justify-center animate-in zoom-in">
-                    <div className="bg-white/10 backdrop-blur-3xl p-6 rounded-full border border-white/20 shadow-2xl">
-                       <CheckCircle2 className="w-16 h-16 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]" />
-                    </div>
-                 </div>
-               )}
+                {status === STATUS_APPROVED && (
+                  <div className="absolute inset-0 bg-green-500/10 backdrop-blur-[2px] flex items-center justify-center animate-in zoom-in">
+                     <div className="bg-white/10 backdrop-blur-3xl p-6 rounded-full border border-white/20 shadow-2xl">
+                        <CheckCircle2 className="w-16 h-16 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]" />
+                     </div>
+                  </div>
+                )}
             </div>
 
             <div className="p-6 space-y-4">
@@ -128,22 +163,22 @@ export default function ClientApprovalPortal({ params }: { params: { id: string 
             </div>
          </div>
 
-         {status !== 'Em Análise' && (
-           <div className={`p-6 rounded-[2rem] border text-center animate-in zoom-in duration-500 ${status === 'Aprovado' ? 'bg-green-500/10 text-green-500 border-green-500/20 shadow-[0_0_30px_rgba(34,197,94,0.1)]' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em]">
-                {status === 'Aprovado' ? 'Criativo Aprovado com Sucesso ✅' : 'Ajustes Solicitados pelo Cliente ❌'}
-              </p>
-           </div>
-         )}
+          {statusInfo && (
+            <div className={`p-6 rounded-[2rem] border text-center animate-in zoom-in duration-500 ${statusInfo.className}`}>
+               <p className="text-[10px] font-black uppercase tracking-[0.3em]">
+                 {statusInfo.text}
+               </p>
+            </div>
+          )}
       </main>
 
       {/* Footer Minimal Centumilia */}
-      {status === 'Em Análise' && (
+      {status === STATUS_PENDING && (
         <footer className="fixed bottom-8 inset-x-0 mx-auto w-full max-w-sm flex gap-3 px-6 z-50">
            <button onClick={() => setShowFeedbackModal(true)} className="flex-1 h-16 rounded-2xl bg-[#111] border border-white/5 flex items-center justify-center gap-3 text-gray-400 font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all hover:bg-red-500/10 hover:text-red-500 group">
               <XCircle className="w-4 h-4 group-hover:scale-110" /> AJUSTE
            </button>
-           <button onClick={() => handleAction('Aprovado')} className="flex-[2] h-16 rounded-2xl bg-brand-cyan flex items-center justify-center gap-3 text-black font-black text-[10px] uppercase tracking-[0.3em] shadow-[0_0_50px_rgba(0,222,254,0.4)] active:scale-95 transition-all group">
+           <button onClick={() => handleAction(STATUS_APPROVED)} className="flex-[2] h-16 rounded-2xl bg-brand-cyan flex items-center justify-center gap-3 text-black font-black text-[10px] uppercase tracking-[0.3em] shadow-[0_0_50px_rgba(0,222,254,0.4)] active:scale-95 transition-all group">
               <CheckCircle2 className="w-5 h-5 group-hover:scale-125" /> APROVAR AGORA
            </button>
         </footer>
@@ -159,7 +194,7 @@ export default function ClientApprovalPortal({ params }: { params: { id: string 
               </div>
               <textarea autoFocus value={feedback} onChange={(e) => setFeedback(e.target.value)} placeholder="Ex: Mudar a cor do texto para azul ou trocar a legenda." className="w-full h-40 bg-black border border-white/5 rounded-3xl p-6 text-sm text-gray-200 outline-none focus:border-red-500 transition-colors resize-none leading-relaxed" />
               <div className="flex flex-col gap-3">
-                 <button onClick={() => handleAction('Ajuste Solicitado', feedback)} className="h-16 bg-red-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] active:scale-95 transition-all shadow-lg shadow-red-600/20">Enviar Feedback</button>
+                  <button onClick={() => handleAction(STATUS_ADJUST, feedback)} className="h-16 bg-red-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] active:scale-95 transition-all shadow-lg shadow-red-600/20">Enviar Feedback</button>
                  <button onClick={() => setShowFeedbackModal(false)} className="h-12 text-gray-600 font-bold text-[10px] uppercase tracking-widest">Cancelar</button>
               </div>
            </div>

@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { isAuthenticated } from '@/lib/auth';
 
 // GET: Lista todos os leads
 export async function GET() {
+  if (!isAuthenticated()) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+  }
+
   const { data, error } = await supabase
     .from('leads')
     .select('*')
@@ -15,6 +20,10 @@ export async function GET() {
 // POST: Cria um novo lead
 export async function POST(request: NextRequest) {
   try {
+    if (!isAuthenticated()) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { nome, empresa, email, phone, segment, message, status } = body;
 
@@ -34,6 +43,10 @@ export async function POST(request: NextRequest) {
 // PATCH: Atualiza lead
 export async function PATCH(request: NextRequest) {
   try {
+    if (!isAuthenticated()) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { id, ...updates } = body;
 
@@ -54,6 +67,10 @@ export async function PATCH(request: NextRequest) {
 // DELETE: Remove um lead da base
 export async function DELETE(request: NextRequest) {
   try {
+    if (!isAuthenticated()) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

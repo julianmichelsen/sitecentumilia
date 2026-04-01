@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { isAuthenticated } from '@/lib/auth';
 
 // GET: Lista todos os clientes
 export async function GET() {
+  if (!isAuthenticated()) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+  }
+
   const { data, error } = await supabase
     .from('clients')
     .select('*')
@@ -15,6 +20,10 @@ export async function GET() {
 // POST: Cria um novo cliente
 export async function POST(request: NextRequest) {
   try {
+    if (!isAuthenticated()) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { name, company, logo_url, status } = body;
 
@@ -34,6 +43,10 @@ export async function POST(request: NextRequest) {
 // DELETE: Remove um cliente
 export async function DELETE(request: NextRequest) {
   try {
+    if (!isAuthenticated()) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

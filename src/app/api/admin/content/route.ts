@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { isAuthenticated } from '@/lib/auth';
 
+const ALLOWED_STATUSES = ['Em Análise', 'Em Produção', 'Aguardando Cliente', 'Aprovado', 'Ajuste Solicitado'];
+
 // GET: Lista todos os posts OU filtra por um magic_link específico
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -24,6 +26,9 @@ export async function GET(request: NextRequest) {
   const { data, error } = await query;
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (magicLink && (!data || data.length === 0)) {
+    return NextResponse.json({ error: 'Link inválido ou expirado' }, { status: 404 });
+  }
   return NextResponse.json(data);
 }
 
@@ -79,6 +84,13 @@ export async function PATCH(request: NextRequest) {
       if (!updates.status) {
         return NextResponse.json({ error: 'Status is required' }, { status: 400 });
       }
+      if (!ALLOWED_STATUSES.includes(updates.status)) {
+        return NextResponse.json({ error: 'Status inválido' }, { status: 400 });
+      }
+    }
+
+    if (updates.status && !ALLOWED_STATUSES.includes(updates.status)) {
+      return NextResponse.json({ error: 'Status inválido' }, { status: 400 });
     }
 
     if (!id && magic_link) {
@@ -89,6 +101,7 @@ export async function PATCH(request: NextRequest) {
         .select()
         .single();
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      if (!data) return NextResponse.json({ error: 'Link inválido ou expirado' }, { status: 404 });
       return NextResponse.json(data);
     }
 
@@ -100,6 +113,7 @@ export async function PATCH(request: NextRequest) {
         .select()
         .single();
        if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+       if (!data) return NextResponse.json({ error: 'Registro não encontrado' }, { status: 404 });
        return NextResponse.json(data);
     }
 

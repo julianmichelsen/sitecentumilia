@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from "react";
-import Link from "next/link";
 import { Mail, Phone, MapPin, Send, ArrowRight, CheckCircle } from "lucide-react";
 
 export default function ContatoPage() {
@@ -72,7 +71,7 @@ export default function ContatoPage() {
                   </div>
                   <div className="space-y-2">
                     <h2 className="text-3xl font-bold text-white">Solicitação Enviada!</h2>
-                    <p className="text-gray-400">Excelente, {formData.nome.split(' ')[0]}. Nossa equipe entrará em contato em breve no WhatsApp informado.</p>
+                    <p className="text-gray-400">Excelente, {(formData.nome || 'Parceiro').split(' ')[0]}. Nossa equipe entrará em contato em breve no WhatsApp informado.</p>
                   </div>
                   <button 
                     onClick={() => { setEnviado(false); setFormData({ nome: '', empresa: '', email: '', telefone: '', segmento: '', mensagem: '' }); }}

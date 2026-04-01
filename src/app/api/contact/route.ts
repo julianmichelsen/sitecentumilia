@@ -4,7 +4,14 @@ import { supabase } from '@/lib/supabase';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { nome, email, phone, empresa, segment, message } = body;
+    const { 
+      nome, 
+      email, 
+      telefone: phone, 
+      empresa, 
+      segmento: segment, 
+      mensagem: message 
+    } = body;
 
     // 1. Grava o lead na tabela 'leads' do CRM Centumilia
     const { data: leadData, error: leadError } = await supabase

@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateCredentials, getAuthToken, getCookieName } from '@/lib/auth';
+import { validateCredentials, getAuthToken, getCookieName, isAuthConfigured } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    if (!isAuthConfigured()) {
+      return NextResponse.json({ error: 'Configuração de autenticação não definida' }, { status: 500 });
+    }
+
     const body = await request.json();
     const { username, password } = body;
 

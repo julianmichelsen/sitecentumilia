@@ -45,13 +45,26 @@ export async function getLogos() {
     .select('*')
     .order('order_index', { ascending: true });
   
-  if (error) return [];
+  if (error) return [
+    { name: 'Conex', logo: '/logos/conex.png', order: 1 },
+    { name: 'Forte Estruturas', logo: '/logos/forte-estruturas.png', order: 2 },
+    { name: 'Asqui', logo: '/logos/asqui.png', order: 3 },
+    { name: 'Invista', logo: '/logos/invista.png', order: 4 },
+    { name: 'Boito', logo: '/logos/boito.png', order: 5 },
+  ];
   return data.map(l => ({ name: l.name, logo: l.logo, order: l.order_index }));
 }
 
 export async function saveLogos(data: any[]) {
-  // Para logos, deletamos os antigos e inserimos os novos (simples)
-  await supabase.from('logos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  const { error: deleteError } = await supabase.from('logos').delete().gte('id', '00000000-0000-0000-0000-000000000000');
+  if (deleteError && deleteError.code !== 'PGRST116') {
+    console.error('Erro ao limpar logos:', deleteError);
+  }
+  const { error } = await supabase.from('logos').insert(
+    data.map(l => ({ name: l.name, logo: l.logo, order_index: l.order }))
+  );
+  return !error;
+}
   const { error } = await supabase.from('logos').insert(
     data.map(l => ({ name: l.name, logo: l.logo, order_index: l.order }))
   );
@@ -70,7 +83,13 @@ export async function getTestimonials() {
 }
 
 export async function saveTestimonials(data: any[]) {
-  await supabase.from('testimonials').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  const { error: deleteError } = await supabase.from('testimonials').delete().gte('id', '00000000-0000-0000-0000-000000000000');
+  if (deleteError && deleteError.code !== 'PGRST116') {
+    console.error('Erro ao limpar depoimentos:', deleteError);
+  }
+  const { error } = await supabase.from('testimonials').insert(data);
+  return !error;
+}
   const { error } = await supabase.from('testimonials').insert(data);
   return !error;
 }

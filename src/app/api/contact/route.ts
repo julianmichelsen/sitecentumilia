@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { consumeContactRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
+  const limitResult = consumeContactRateLimit(request);
+  if (!limitResult.ok) {
+    return NextResponse.json({ error: 'Muitas tentativas. Aguarde um momento.' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const { 

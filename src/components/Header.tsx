@@ -18,10 +18,9 @@ export default function Header() {
   }, []);
 
   const navLinks = [
-    { name: "Cases", href: "/#cases" },
-    { name: "Metodologia", href: "/metodologia" },
-    { name: "Blog", href: "/blog" },
-    { name: "Admin", href: "/admin" },
+    { name: "Cases", href: "/cases" },
+    { name: "Metodologia", href: "/#metodologia" },
+    { name: "Soluções", href: "/#solucoes" },
   ];
 
   return (

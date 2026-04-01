@@ -21,8 +21,7 @@ import Reveal from "@/components/Reveal";
 import { getAllPosts } from "@/lib/markdown";
 import { getLogos, getTestimonials, getConfig } from "@/lib/content";
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export default async function Home() {
   const cases = await getAllPosts("cases");
@@ -292,9 +291,9 @@ export default async function Home() {
                     <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter text-white uppercase leading-none">Conheça também a <br/><span className="text-brand-purple">Escola Centum.</span></h2>
                     <p className="max-w-xl text-gray-400 text-lg leading-relaxed">Nossa frente educacional e ecossistema de negócios para empreendedores que desejam dominar o próprio crescimento e parar de depender do improviso.</p>
                  </div>
-                 <Link href="#" className="btn-epic glass-elite py-5 px-10 text-[11px] tracking-[0.3em] font-black flex items-center gap-3 hover:bg-brand-purple hover:text-white transition-all relative z-10 group-hover:scale-105 border-white/5 active:scale-95 shadow-2xl">
-                    SABER MAIS <ArrowUpRight className="w-4 h-4" />
-                 </Link>
+                  <Link href="/contato" className="btn-epic glass-elite py-5 px-10 text-[11px] tracking-[0.3em] font-black flex items-center gap-3 hover:bg-brand-purple hover:text-white transition-all relative z-10 group-hover:scale-105 border-white/5 active:scale-95 shadow-2xl">
+                     SABER MAIS <ArrowUpRight className="w-4 h-4" />
+                  </Link>
               </Reveal>
            </div>
         </section>
@@ -307,9 +306,9 @@ export default async function Home() {
                 A HORA DA <br/> <span className="text-gradient">ESCALA</span> É AGORA.
               </h2>
               <p className="text-gray-400 text-xl font-medium relative z-10">Agende uma conversa estratégica com nossos especialistas e descubra como o método CENTUM pode funcionar para você.</p>
-              <div className="relative z-10 pt-10">
-                 <Link href="/contato" className="btn-epic-neon scale-150">Falar com Especialista</Link>
-              </div>
+               <div className="relative z-10 pt-10">
+                  <Link href="/contato" className="btn-epic-neon text-lg px-12 py-5">Falar com Especialista</Link>
+               </div>
            </Reveal>
         </section>
       </main>

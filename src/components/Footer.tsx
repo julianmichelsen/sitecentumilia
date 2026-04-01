@@ -38,9 +38,9 @@ export default function Footer() {
             <h4 className="text-[10px] font-black text-white uppercase tracking-[0.4em]">Explorar</h4>
             <ul className="space-y-4 text-xs font-black uppercase tracking-widest">
               <li><Link href="/" className="text-gray-500 hover:text-brand-neon transition-all">Ecossistema</Link></li>
-              <li><Link href="/metodologia" className="text-gray-500 hover:text-brand-neon transition-all">Método CENTUM</Link></li>
+              <li><Link href="/#metodologia" className="text-gray-500 hover:text-brand-neon transition-all">Método CENTUM</Link></li>
               <li><Link href="/cases" className="text-gray-500 hover:text-brand-neon transition-all">Cases de Elite</Link></li>
-              <li><Link href="/blog" className="text-gray-500 hover:text-brand-neon transition-all">Blog Insights</Link></li>
+              <li><Link href="/#solucoes" className="text-gray-500 hover:text-brand-neon transition-all">Soluções</Link></li>
             </ul>
           </div>
           

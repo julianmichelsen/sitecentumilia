@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 
 export default function ContatoPage() {
   const [enviado, setEnviado] = useState(false);
@@ -45,17 +45,18 @@ export default function ContatoPage() {
       });
 
       if (res.ok) {
+        setErros({});
         setEnviado(true);
       } else {
         const data = await res.json().catch(() => ({}));
         if (res.status === 429) {
           setErros({ form: "Muitas tentativas. Aguarde um momento." });
         } else {
-          setEnviado(true);
+          setErros({ form: data.error || "Não foi possível enviar sua solicitação. Tente novamente em instantes." });
         }
       }
-    } catch (err) {
-      setEnviado(true);
+    } catch {
+      setErros({ form: "Erro de conexão. Verifique sua internet e tente novamente." });
     } finally {
       setCarregando(false);
     }

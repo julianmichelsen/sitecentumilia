@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { 
   Users, 
   TrendingUp, 
@@ -9,6 +10,7 @@ import {
   CheckCircle2, 
   Clock, 
   Briefcase, 
+  FileText,
   ArrowUpRight,
   BarChart3,
   Instagram
@@ -70,6 +72,26 @@ export default function AdminDashboard() {
           <StatCard title="Em Operação" value={stats.tasks} icon={Briefcase} color="bg-brand-cyan" trend="Sinc. OK" />
           <StatCard title="Aguard. Aprovação" value={stats.pending} icon={Instagram} color="bg-brand-blue" trend="3 Críticos" />
           <StatCard title="Parceiros" value={stats.clients} icon={Users} color="bg-brand-purple" trend="Base Ativa" />
+       </div>
+
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Link href="/admin/blog?new=true" className="glass-card glass-card-hover rounded-[2rem] p-8 border border-brand-neon/20 group">
+             <div className="flex items-center justify-between mb-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-neon">Ação Rápida</p>
+                <FileText className="w-5 h-5 text-brand-neon group-hover:scale-110 transition-transform" />
+             </div>
+             <h3 className="text-2xl font-black italic tracking-tighter text-white uppercase">Novo Post no Blog</h3>
+             <p className="text-sm text-gray-500 mt-2">Abrir editor para criar e publicar um artigo.</p>
+          </Link>
+
+          <Link href="/admin/cases?new=true" className="glass-card glass-card-hover rounded-[2rem] p-8 border border-brand-cyan/20 group">
+             <div className="flex items-center justify-between mb-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-cyan">Ação Rápida</p>
+                <Briefcase className="w-5 h-5 text-brand-cyan group-hover:scale-110 transition-transform" />
+             </div>
+             <h3 className="text-2xl font-black italic tracking-tighter text-white uppercase">Novo Case</h3>
+             <p className="text-sm text-gray-500 mt-2">Abrir editor para cadastrar um novo case.</p>
+          </Link>
        </div>
 
        {/* Active Strategy Area */}

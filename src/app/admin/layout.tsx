@@ -8,6 +8,8 @@ import {
   PieChart, 
   LogOut, 
   Instagram, 
+  FileText,
+  FolderOpen,
   Zap,
   Briefcase
 } from 'lucide-react';
@@ -29,6 +31,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
     { name: 'CRM (Vendas)', icon: PieChart, href: '/admin/crm' },
+    { name: 'Blog', icon: FileText, href: '/admin/blog' },
+    { name: 'Cases', icon: FolderOpen, href: '/admin/cases' },
     { name: 'Demandas (Op.)', icon: Briefcase, href: '/admin/tasks' },
     { name: 'Pode Postar?', icon: Instagram, href: '/admin/content' },
     { name: 'Clientes Ativos', icon: Users, href: '/admin/clients' },

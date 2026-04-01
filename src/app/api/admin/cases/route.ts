@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '@/lib/auth';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET() {
   if (!isAuthenticated()) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
   try {
-    const { data, error } = await supabase.from('cases').select('*').order('date', { ascending: false });
+    const { data, error } = await supabaseAdmin.from('cases').select('*').order('date', { ascending: false });
     if (error) throw error;
     return NextResponse.json(data);
   } catch (error) {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       date: body.date
     };
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('cases')
       .upsert(dbData, { onConflict: 'slug' });
     
@@ -62,7 +62,7 @@ export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const slug = searchParams.get('slug');
   
-  const { error } = await supabase.from('cases').delete().eq('slug', slug);
+  const { error } = await supabaseAdmin.from('cases').delete().eq('slug', slug);
   if (error) return NextResponse.json({ error: 'Erro ao deletar' }, { status: 500 });
   
   return NextResponse.json({ success: true });

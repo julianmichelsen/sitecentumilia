@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '@/lib/auth';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function POST(request: NextRequest) {
   if (!isAuthenticated()) {
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const filePath = `uploads/${fileName}`;
 
     // Tenta o upload
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseAdmin.storage
       .from('media')
       .upload(filePath, file, {
         cacheControl: '3600',
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
        }, { status: 500 });
     }
 
-    const { data: { publicUrl } } = supabase.storage
+    const { data: { publicUrl } } = supabaseAdmin.storage
       .from('media')
       .getPublicUrl(filePath);
 

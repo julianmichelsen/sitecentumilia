@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '@/lib/auth';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET() {
   if (!isAuthenticated()) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
-  const { data, error } = await supabase.from('config').select('*').single();
+  const { data, error } = await supabaseAdmin.from('config').select('*').single();
   if (error) return NextResponse.json({ siteName: 'Centumilia' });
   return NextResponse.json({
     siteName: data.site_name,
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     instagram: body.instagram,
     linkedin: body.linkedin
   };
-  const { error } = await supabase.from('config').upsert(dbData);
+  const { error } = await supabaseAdmin.from('config').upsert(dbData);
   if (error) return NextResponse.json({ error: 'Erro ao salvar' }, { status: 500 });
   return NextResponse.json({ success: true });
 }

@@ -6,6 +6,10 @@ const LOGIN_PATH = '/admin/login';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  if (pathname.startsWith('/api/admin/content')) {
+    return NextResponse.next();
+  }
+
   if (pathname.startsWith(LOGIN_PATH)) {
     return NextResponse.next();
   }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { isAuthenticated } from '@/lib/auth';
 
 // GET: Lista todos os leads
@@ -8,7 +8,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('leads')
     .select('*')
     .order('created_at', { ascending: false });
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { nome, empresa, email, phone, segment, message, status } = body;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('leads')
       .insert([{ nome, empresa, email, phone, segment, message, status: status || 'Novo' }])
       .select()
@@ -50,7 +50,7 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const { id, ...updates } = body;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('leads')
       .update(updates)
       .eq('id', id)
@@ -76,7 +76,7 @@ export async function DELETE(request: NextRequest) {
 
     if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('leads')
       .delete()
       .eq('id', id);

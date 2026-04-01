@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '@/lib/auth';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET() {
   if (!isAuthenticated()) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
-  const { data, error } = await supabase.from('logos').select('*').order('order_index', { ascending: true });
+  const { data, error } = await supabaseAdmin.from('logos').select('*').order('order_index', { ascending: true });
   if (error) return NextResponse.json([]);
   return NextResponse.json(data.map(l => ({ name: l.name, logo: l.logo, order: l.order_index })));
 }
@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
   const body = await request.json(); // Array de logos
   
   // Para logos, deletamos os antigos e inserimos os novos (simples)
-  await supabase.from('logos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  const { error } = await supabase.from('logos').insert(
+  await supabaseAdmin.from('logos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  const { error } = await supabaseAdmin.from('logos').insert(
     body.map((l: any, i: number) => ({ 
       name: l.name, 
       logo: l.logo, 

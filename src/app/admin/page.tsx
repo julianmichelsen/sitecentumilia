@@ -13,7 +13,6 @@ import {
   BarChart3,
   Instagram
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ leads: 0, tasks: 0, pending: 0, clients: 0 });
@@ -25,17 +24,13 @@ export default function AdminDashboard() {
 
   async function fetchStats() {
     try {
-      const [l, t, p, c] = await Promise.all([
-        supabase.from('leads').select('*', { count: 'exact' }),
-        supabase.from('tasks').select('*', { count: 'exact' }).eq('status', 'Produção'),
-        supabase.from('content_posts').select('*', { count: 'exact' }).eq('status', 'Aguardando Cliente'),
-        supabase.from('clients').select('*', { count: 'exact' })
-      ]);
+      const res = await fetch('/api/admin/metrics');
+      const data = await res.json();
       setStats({
-        leads: l.count || 0,
-        tasks: t.count || 0,
-        pending: p.count || 0,
-        clients: c.count || 0
+        leads: data.leads || 0,
+        tasks: data.tasks || 0,
+        pending: data.pending || 0,
+        clients: data.clients || 0
       });
     } catch (_) {} finally { setLoading(false); }
   }

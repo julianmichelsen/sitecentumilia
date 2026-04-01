@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { isAuthenticated } from '@/lib/auth';
 
 const ALLOWED_STATUSES = ['Em Análise', 'Em Produção', 'Aguardando Cliente', 'Aprovado', 'Ajuste Solicitado'];
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
 
-  let query = supabase
+  let query = supabaseAdmin
     .from('content_posts')
     .select('*');
 
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { client_id, title, media_url, caption, status, scheduled_at } = body;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('content_posts')
       .insert([{ 
         client_id, 
@@ -94,7 +94,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (!id && magic_link) {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('content_posts')
         .update(updates)
         .eq('magic_link', magic_link)
@@ -106,7 +106,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (id) {
-       const { data, error } = await supabase
+       const { data, error } = await supabaseAdmin
         .from('content_posts')
         .update(updates)
         .eq('id', id)
@@ -135,7 +135,7 @@ export async function DELETE(request: NextRequest) {
 
     if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('content_posts')
       .delete()
       .eq('id', id);

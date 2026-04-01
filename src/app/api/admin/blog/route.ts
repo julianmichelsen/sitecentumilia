@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '@/lib/auth';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET() {
   if (!isAuthenticated()) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
-  const { data, error } = await supabase.from('blog').select('*').order('date', { ascending: false });
+  const { data, error } = await supabaseAdmin.from('blog').select('*').order('date', { ascending: false });
   if (error) return NextResponse.json({ error: 'Erro ao listar' }, { status: 500 });
   return NextResponse.json(data);
 }
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     date: body.date
   };
 
-  const { error } = await supabase.from('blog').upsert(dbData, { onConflict: 'slug' });
+  const { error } = await supabaseAdmin.from('blog').upsert(dbData, { onConflict: 'slug' });
   if (error) return NextResponse.json({ error: 'Erro ao salvar' }, { status: 500 });
   return NextResponse.json({ success: true });
 }
@@ -36,7 +36,7 @@ export async function DELETE(request: NextRequest) {
   }
   const { searchParams } = new URL(request.url);
   const slug = searchParams.get('slug');
-  const { error } = await supabase.from('blog').delete().eq('slug', slug);
+  const { error } = await supabaseAdmin.from('blog').delete().eq('slug', slug);
   if (error) return NextResponse.json({ error: 'Erro ao deletar' }, { status: 500 });
   return NextResponse.json({ success: true });
 }

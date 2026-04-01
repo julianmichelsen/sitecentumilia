@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { isAuthenticated } from '@/lib/auth';
 
 // GET: Lista todos os clientes
@@ -8,7 +8,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('clients')
     .select('*')
     .order('created_at', { ascending: false });
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, company, logo_url, status } = body;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('clients')
       .insert([{ name, company, logo_url, status }])
       .select()
@@ -52,7 +52,7 @@ export async function DELETE(request: NextRequest) {
 
     if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('clients')
       .delete()
       .eq('id', id);

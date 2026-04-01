@@ -4,13 +4,13 @@ import { validateCredentials, getAuthToken, getCookieName, isAuthConfigured } fr
 export async function POST(request: NextRequest) {
   try {
     if (!isAuthConfigured()) {
-      console.error('Auth configuration missing:', {
-        hasUser: !!process.env.ADMIN_USERNAME,
-        hasPass: !!process.env.ADMIN_PASSWORD,
-        hasToken: !!process.env.ADMIN_AUTH_TOKEN
-      });
+      const missing = [];
+      if (!process.env.ADMIN_USERNAME) missing.push("ADMIN_USERNAME");
+      if (!process.env.ADMIN_PASSWORD) missing.push("ADMIN_PASSWORD");
+      if (!process.env.ADMIN_AUTH_TOKEN) missing.push("ADMIN_AUTH_TOKEN");
+      
       return NextResponse.json({ 
-        error: 'Servidor não configurado corretamente. Verifique as variáveis de ambiente.' 
+        error: `Servidor não configurado. Faltando no .env: ${missing.join(", ")}` 
       }, { status: 500 });
     }
 

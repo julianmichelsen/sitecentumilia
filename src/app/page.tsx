@@ -80,10 +80,10 @@ export default async function Home() {
             </Reveal>
             
             <Reveal className="stagger-1 w-full overflow-visible relative">
-               {/* AJUSTE DEFINITIVO: leading-[1.4], py-10 e overflow-visible para garantir que nada corte */}
-               <h1 className="text-5xl font-black tracking-tighter text-white md:text-8xl lg:text-[7rem] italic uppercase leading-[1.4] mb-6 drop-shadow-2xl py-10 overflow-visible">
-                 Pare de depender do <span className="text-gradient">improviso</span>.<br />
-                 Comece a viver de <span className="text-gradient" style={{ animationDelay: '-2s' }}>processo</span>.
+               {/* AJUSTE DEFINITIVO: leading-[1.2] e pr-4 para garantir que o ponto (itálico) não corte no gradiente */}
+               <h1 className="text-5xl font-black tracking-tighter text-white md:text-8xl lg:text-[7.5rem] italic uppercase leading-[1.2] mb-6 drop-shadow-2xl py-10 overflow-visible">
+                 Pare de depender <br /> do <span className="text-gradient pr-4">improviso.</span><br />
+                 Comece a viver <br /> de <span className="text-gradient pr-4" style={{ animationDelay: '-2s' }}>processo.</span>
                </h1>
             </Reveal>
 

@@ -14,7 +14,7 @@ export async function uploadMedia(file: File, bucket: string = 'media') {
     const filePath = `${fileName}`;
 
     // 1. Upload do arquivo
-    const { data, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(filePath, file);
 

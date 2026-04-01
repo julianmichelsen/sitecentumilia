@@ -1,20 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   CheckCircle2, 
   XCircle, 
   ShieldCheck,
   Calendar,
-  Clock,
   Heart,
   MessageCircle,
-  Send,
   Bookmark,
   Loader2,
   Instagram,
   MoreHorizontal,
-  ChevronLeft,
   Share2
 } from 'lucide-react';
 
@@ -69,11 +66,7 @@ export default function ClientApprovalPortal({ params }: { params: { id: string 
     };
   })();
 
-  useEffect(() => {
-    fetchPost();
-  }, []);
-
-  async function fetchPost() {
+  const fetchPost = useCallback(async () => {
     try {
       const res = await fetch(`/api/admin/content?magic_link=${params.id}`);
       const data = await res.json();
@@ -82,7 +75,11 @@ export default function ClientApprovalPortal({ params }: { params: { id: string 
         setStatus(data[0].status);
       }
     } catch (_) {} finally { setLoading(false); }
-  }
+  }, [params.id]);
+
+  useEffect(() => {
+    fetchPost();
+  }, [fetchPost]);
 
   const handleAction = async (newStatus: string, fb: string = '') => {
     await fetch('/api/admin/content', {

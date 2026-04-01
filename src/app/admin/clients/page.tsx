@@ -3,21 +3,13 @@
 import { useState, useEffect } from 'react';
 import { 
   Plus, 
-  Search, 
-  Users, 
-  MoreVertical, 
   Trash2, 
-  Calendar, 
-  ExternalLink,
-  Briefcase,
   X,
   Loader2,
   CheckCircle2,
-  ShieldCheck,
   Building2,
   Gem,
-  UploadCloud,
-  ImageIcon
+  UploadCloud
 } from 'lucide-react';
 import { uploadMedia } from '@/lib/storage';
 
@@ -120,7 +112,7 @@ export default function ClientsPage() {
                  
                  <div className="flex items-center gap-6 mb-10 relative z-10">
                     <div className="w-20 h-20 rounded-[2rem] bg-black border border-white/5 flex items-center justify-center text-2xl font-black text-gray-700 overflow-hidden shadow-inner group-hover:scale-110 transition-transform duration-500">
-                       {client.logo_url ? <img src={client.logo_url} className="w-full h-full object-cover" /> : <Building2 className="w-8 h-8 opacity-20" />}
+                       {client.logo_url ? <img src={client.logo_url} alt={`Logo ${client.name}`} className="w-full h-full object-cover" /> : <Building2 className="w-8 h-8 opacity-20" />}
                     </div>
                     <div className="flex-1 min-w-0">
                        <h3 className="text-xl font-black italic tracking-tight text-white uppercase leading-none truncate">{client.name}</h3>
@@ -166,7 +158,7 @@ export default function ClientsPage() {
                     <div className="relative group/logo h-32 w-32 mx-auto rounded-[2rem] border-2 border-dashed border-white/10 hover:border-brand-purple/40 transition-all flex flex-col items-center justify-center gap-2 bg-white/[0.01] overflow-hidden mb-8">
                        {newClient.logo_url ? (
                          <>
-                           <img src={newClient.logo_url} className="absolute inset-0 w-full h-full object-cover" />
+                            <img src={newClient.logo_url} alt="Logo do novo parceiro" className="absolute inset-0 w-full h-full object-cover" />
                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/logo:opacity-100 transition-opacity flex items-center justify-center">
                               <p className="text-[8px] font-black uppercase tracking-widest text-white">Trocar Logo</p>
                               <input type="file" accept="image/*" onChange={handleLogoUpload} className="absolute inset-0 opacity-0 cursor-pointer" />

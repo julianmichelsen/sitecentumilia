@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Instagram, Linkedin, MapPin, Phone, Mail, ArrowUpRight } from "lucide-react";
+import { Instagram, Linkedin, MapPin, Phone, Mail } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -22,7 +22,7 @@ export default function Footer() {
               </div>
             </Link>
             <p className="max-w-xs text-sm text-gray-400 font-medium leading-relaxed italic">
-              "Transformamos marketing em um sistema previsível de crescimento. Mais que tráfego, entregamos retorno real através do Método CENTUM."
+              &ldquo;Transformamos marketing em um sistema previsível de crescimento. Mais que tráfego, entregamos retorno real através do Método CENTUM.&rdquo;
             </p>
             <div className="flex gap-4 pt-4">
               <Link href="https://www.instagram.com/centumilia/" target="_blank" className="w-12 h-12 glass-elite rounded-2xl flex items-center justify-center text-gray-400 hover:text-brand-neon hover:border-brand-neon/40 transition-all">

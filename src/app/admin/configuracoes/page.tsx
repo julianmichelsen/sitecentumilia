@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Save, Phone, Mail, MapPin, Instagram, Linkedin, Globe, MessageCircle } from 'lucide-react';
+import { Save, Phone, Mail, MapPin, Instagram, Globe, MessageCircle } from 'lucide-react';
 
 interface Config {
   siteName: string;
@@ -22,11 +22,7 @@ export default function AdminConfig() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    loadConfig();
-  }, []);
-
-  async function loadConfig() {
+  const loadConfig = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/config');
       if (res.status === 401) { router.push('/admin/login'); return; }
@@ -34,7 +30,11 @@ export default function AdminConfig() {
       setConfig(data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  }
+  }, [router]);
+
+  useEffect(() => {
+    loadConfig();
+  }, [loadConfig]);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();

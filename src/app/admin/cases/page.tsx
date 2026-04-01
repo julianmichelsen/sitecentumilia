@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Plus, Pencil, Trash2, Save, X, ArrowLeft, Briefcase, Loader2, Check, Eye, Layout } from 'lucide-react';
+import { Plus, Pencil, Trash2, Save, ArrowLeft, Loader2, Eye, Layout } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface CaseData {
@@ -40,14 +40,7 @@ function AdminCasesContent() {
   const [message, setMessage] = useState('');
   const [showPreview, setShowPreview] = useState(false);
 
-  useEffect(() => {
-    loadCases();
-    if (searchParams.get('new') === 'true') {
-      setEditing({ ...emptyCaseData });
-    }
-  }, [searchParams]);
-
-  async function loadCases() {
+  const loadCases = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/cases');
       if (res.status === 401) { router.push('/admin/login'); return; }
@@ -55,7 +48,14 @@ function AdminCasesContent() {
       setCases(Array.isArray(data) ? data : []);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  }
+  }, [router]);
+
+  useEffect(() => {
+    loadCases();
+    if (searchParams.get('new') === 'true') {
+      setEditing({ ...emptyCaseData });
+    }
+  }, [loadCases, searchParams]);
 
   async function handleSave() {
     if (!editing) return;

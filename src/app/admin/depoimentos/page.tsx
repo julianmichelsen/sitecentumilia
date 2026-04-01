@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Save, MessageSquare, Star, User, MoveUp, MoveDown } from 'lucide-react';
+import { Trash2, Star, User, MoveUp, MoveDown } from 'lucide-react';
 
 interface Testimonial {
   id: string;
@@ -22,11 +22,7 @@ export default function AdminTestimonials() {
     quote: '', author: '', role: '', rating: 5
   });
 
-  useEffect(() => {
-    loadTestimonials();
-  }, []);
-
-  async function loadTestimonials() {
+  const loadTestimonials = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/testimonials');
       if (res.status === 401) { router.push('/admin/login'); return; }
@@ -34,7 +30,11 @@ export default function AdminTestimonials() {
       setTestimonials(Array.isArray(data) ? data.sort((a, b) => a.order - b.order) : []);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  }
+  }, [router]);
+
+  useEffect(() => {
+    loadTestimonials();
+  }, [loadTestimonials]);
 
   async function handleAdd() {
     if (!newTestimonial.quote || !newTestimonial.author) return;
@@ -157,7 +157,7 @@ export default function AdminTestimonials() {
                     {[1,2,3,4,5].map(s => <Star key={s} className={`w-3.5 h-3.5 ${t.rating >= s ? 'text-yellow-500 fill-current' : 'text-gray-800'}`} />)}
                   </div>
                 </div>
-                <p className="text-gray-300 text-sm italic leading-relaxed">"{t.quote}"</p>
+                <p className="text-gray-300 text-sm italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
                 
                 <div className="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-[#111] pl-2">
                   <button onClick={() => move(index, 'up')} className="p-1.5 text-gray-400 hover:text-white"><MoveUp className="w-4 h-4" /></button>

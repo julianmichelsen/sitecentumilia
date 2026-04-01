@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // 1. Grava o lead na tabela 'leads' do CRM Centumilia
-    const { data: leadData, error: leadError } = await supabase
+    const { error: leadError } = await supabase
       .from('leads')
       .insert([
         { 
@@ -32,9 +32,7 @@ export async function POST(request: NextRequest) {
           message,
           status: 'Novo' 
         }
-      ])
-      .select()
-      .single();
+      ]);
 
     if (leadError) {
       console.error('Erro ao salvar lead no banco:', leadError);

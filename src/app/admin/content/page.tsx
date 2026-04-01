@@ -3,21 +3,11 @@
 import { useState, useEffect } from 'react';
 import { 
   Plus, 
-  Image as ImageIcon, 
-  Send, 
-  CheckCircle, 
-  Clock, 
-  Trash2, 
   Loader2,
-  Calendar,
-  Eye,
   Copy,
   X,
   Edit3,
-  ExternalLink,
-  Instagram,
   CheckCircle2,
-  AlertCircle,
   Gem,
   UploadCloud
 } from 'lucide-react';
@@ -44,7 +34,6 @@ const CONTENT_COLUMNS = ['Em Análise', 'Em Produção', 'Aguardando Cliente', '
 export default function ContentApprovalPage() {
   const [posts, setPosts] = useState<ContentPost[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(true);
   const [editPost, setEditPost] = useState<ContentPost | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPost, setNewPost] = useState({ client_id: '', title: '', media_url: '', caption: '', scheduled_at: '', status: 'Aguardando Cliente' });
@@ -60,7 +49,6 @@ export default function ContentApprovalPage() {
       setPosts(Array.isArray(pData) ? pData : []);
       setClients(Array.isArray(cData) ? cData : []);
     } catch (_) {}
-    finally { setLoading(false); }
   }
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,14 +95,6 @@ export default function ContentApprovalPage() {
         setTimeout(() => setMessage(''), 3000);
       }
     } catch (_) {}
-  }
-
-  async function handleDelete(id: string) {
-     if (!confirm('Deseja excluir esse criativo permanentemente?')) return;
-     try {
-       const res = await fetch(`/api/admin/content?id=${id}`, { method: 'DELETE' });
-       if (res.ok) fetchData();
-     } catch (_) {}
   }
 
   const generateMagicLink = () => {
@@ -186,7 +166,7 @@ export default function ContentApprovalPage() {
                    {posts.filter(p => p.status === col).map(post => (
                      <div key={post.id} draggable onDragStart={(e) => handleDragStart(e, post.id)} className="glass-card mb-6 rounded-[2.5rem] overflow-hidden hover:border-brand-cyan/40 transition-all duration-700 cursor-move group relative shadow-2xl active:scale-95">
                         <div className="aspect-[4/5] relative w-full overflow-hidden bg-brand-dark">
-                           <img src={post.media_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms]" />
+                           <img src={post.media_url} alt={`Criativo ${post.title}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms]" />
                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60"></div>
                            <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button onClick={() => { setEditPost(post); setIsModalOpen(true); }} className="w-9 h-9 glass-card rounded-xl flex items-center justify-center text-white hover:bg-brand-cyan hover:text-black transition-all">
@@ -229,7 +209,7 @@ export default function ContentApprovalPage() {
                  <div className="relative group/upload h-48 rounded-[2.5rem] border-2 border-dashed border-white/10 hover:border-brand-cyan/40 transition-all flex flex-col items-center justify-center gap-4 bg-white/[0.01] overflow-hidden">
                     {(editPost?.media_url || newPost.media_url) ? (
                       <>
-                        <img src={editPost ? editPost.media_url : newPost.media_url} className="absolute inset-0 w-full h-full object-cover opacity-20" />
+                        <img src={editPost ? editPost.media_url : newPost.media_url} alt="Preview do criativo" className="absolute inset-0 w-full h-full object-cover opacity-20" />
                         <div className="relative z-10 flex flex-col items-center">
                            <CheckCircle2 className="w-8 h-8 text-brand-neon mb-2" />
                            <p className="text-[10px] font-black uppercase tracking-widest text-white">Criativo Carregado</p>

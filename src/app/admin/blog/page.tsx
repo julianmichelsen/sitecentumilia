@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Plus, Pencil, Trash2, Save, X, ArrowLeft, FileText, Loader2, Check, Eye, Layout } from 'lucide-react';
+import { Plus, Pencil, Trash2, Save, ArrowLeft, Loader2, Eye, Layout } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface PostData {
@@ -34,14 +34,7 @@ function AdminBlogContent() {
   const [message, setMessage] = useState('');
   const [showPreview, setShowPreview] = useState(false);
 
-  useEffect(() => {
-    loadPosts();
-    if (searchParams.get('new') === 'true') {
-      setEditing({ ...emptyPostData });
-    }
-  }, [searchParams]);
-
-  async function loadPosts() {
+  const loadPosts = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/blog');
       if (res.status === 401) {
@@ -55,7 +48,14 @@ function AdminBlogContent() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [router]);
+
+  useEffect(() => {
+    loadPosts();
+    if (searchParams.get('new') === 'true') {
+      setEditing({ ...emptyPostData });
+    }
+  }, [loadPosts, searchParams]);
 
   async function handleSave() {
     if (!editing) return;

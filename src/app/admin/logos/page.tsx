@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Save, ImageIcon, Upload, MoveUp, MoveDown } from 'lucide-react';
+import { Trash2, Upload, MoveUp, MoveDown } from 'lucide-react';
 
 interface Logo {
   name: string;
@@ -14,16 +14,11 @@ export default function AdminLogos() {
   const router = useRouter();
   const [logos, setLogos] = useState<Logo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [newLogo, setNewLogo] = useState({ name: '', logo: '' });
   const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
-    loadLogos();
-  }, []);
-
-  async function loadLogos() {
+  const loadLogos = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/logos');
       if (res.status === 401) { router.push('/admin/login'); return; }
@@ -31,7 +26,11 @@ export default function AdminLogos() {
       setLogos(Array.isArray(data) ? data.sort((a, b) => a.order - b.order) : []);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  }
+  }, [router]);
+
+  useEffect(() => {
+    loadLogos();
+  }, [loadLogos]);
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     if (!e.target.files?.[0]) return;
@@ -86,7 +85,6 @@ export default function AdminLogos() {
   }
 
   async function saveLogos(data: Logo[]) {
-    setSaving(true);
     try {
       const res = await fetch('/api/admin/logos', {
         method: 'PUT',
@@ -99,8 +97,6 @@ export default function AdminLogos() {
       }
     } catch (err) {
       setMessage('Erro ao salvar');
-    } finally {
-      setSaving(false);
     }
   }
 

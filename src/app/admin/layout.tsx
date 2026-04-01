@@ -6,11 +6,8 @@ import {
   Users, 
   LayoutDashboard, 
   PieChart, 
-  Settings, 
   LogOut, 
   Instagram, 
-  Box, 
-  Send,
   Zap,
   Briefcase
 } from 'lucide-react';

@@ -40,26 +40,6 @@ export function consumeContactRateLimit(request: NextRequest) {
   return { ok: true, remaining: contactLimit - bucket.count, reset: bucket.resetAt };
 }
 
-export function consumeContactRateLimit(request: NextRequest) {
-  const now = Date.now();
-  const id = getClientId(request);
-  const key = `contact_${id}`;
-  const bucket = store.get(key);
-  const contactLimit = 3;
-
-  if (!bucket || bucket.resetAt <= now) {
-    store.set(key, { count: 1, resetAt: now + WINDOW_MS });
-    return { ok: true, remaining: contactLimit - 1, reset: now + WINDOW_MS };
-  }
-
-  if (bucket.count >= contactLimit) {
-    return { ok: false, remaining: 0, reset: bucket.resetAt };
-  }
-
-  bucket.count += 1;
-  return { ok: true, remaining: contactLimit - bucket.count, reset: bucket.resetAt };
-}
-
 export function consumeAdminRateLimit(request: NextRequest) {
   const now = Date.now();
   const id = getClientId(request);

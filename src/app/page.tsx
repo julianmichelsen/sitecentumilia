@@ -143,9 +143,9 @@ export default async function Home() {
             {/* Logos de Clientes Atendidos - AJUSTE: Copy Ética e Opacidade */}
             <Reveal className="mt-40 stagger-3">
               <p className="text-center text-[10px] font-black text-white/40 uppercase tracking-[0.4em] mb-16">Marcas que já passaram pelo nosso método</p>
-              <div className="flex flex-wrap justify-center gap-16 md:gap-24 opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-opacity duration-700">
+              <div className="flex flex-wrap justify-center items-center gap-16 md:gap-24 opacity-80 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-700">
                 {logos.length > 0 ? logos.map((client: any, i: number) => (
-                  <div key={i} className="relative h-8 w-32 flex items-center justify-center hover:scale-110 transition-transform">
+                  <div key={i} className="relative h-12 w-48 flex items-center justify-center hover:scale-110 transition-transform">
                     <Image
                       src={client.logo}
                       alt={client.name}

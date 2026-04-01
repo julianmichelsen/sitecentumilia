@@ -35,29 +35,12 @@ export default async function Home() {
   const logos = (await getLogos()).sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
   const config = await getConfig();
 
-  // Depoimentos Reais fornecidos pelo usuário
-  const realTestimonials = [
-    {
-      id: '1',
-      author: 'Asqui Imports',
-      role: 'Importação B2B',
-      quote: 'A Centumilia organizou nossa demanda de forma previsível. O trabalho focado em tráfego e posicionamento profissionalizou nossa captação.',
-      rating: 5
-    },
-    {
-      id: '2',
-      author: 'Unius Logística',
-      role: 'Estratégia & Operação',
-      quote: 'Ter a operação comercial alinhada com as campanhas faz toda a diferença. Não são apenas posts, é estratégia focada em contatos reais.',
-      rating: 5
-    },
-    {
-      id: '3',
-      author: 'Invista Imóveis',
-      role: 'Setor Imobiliário',
-      quote: 'Uma agência que entende que o resultado final tem que ser faturamento, otimizando nossos recursos para gerar leads qualificados.',
-      rating: 5
-    }
+  // Depoimentos Dinâmicos do Supabase (com reserva se vazio)
+  const dbTestimonials = await getTestimonials();
+  const testimonials = dbTestimonials.length > 0 ? dbTestimonials : [
+    { id: '1', author: 'Asqui Imports', role: 'Importação B2B', quote: 'A Centumilia organizou nossa demanda de forma previsível. O trabalho focado em tráfego e posicionamento profissionalizou nossa captação.', rating: 5 },
+    { id: '2', author: 'Unius Logística', role: 'Estratégia & Operação', quote: 'Ter a operação comercial alinhada com as campanhas faz toda a diferença. Não são apenas posts, é estratégia focada em contatos reais.', rating: 5 },
+    { id: '3', author: 'Invista Imóveis', role: 'Setor Imobiliário', quote: 'Uma agência que entende que o resultado final tem que ser faturamento, otimizando nossos recursos para gerar leads qualificados.', rating: 5 }
   ];
 
   return (
@@ -227,7 +210,7 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Cases de Sucesso - AJUSTE: Asqui Imports no Topo */}
+        {/* Cases de Sucesso */}
         <section id="cases" className="w-full py-40 border-b border-white/5">
           <div className="container px-4 md:px-6 mx-auto space-y-24">
             <Reveal className="flex flex-col md:flex-row items-center justify-between gap-10">
@@ -265,7 +248,7 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Prova Social - AJUSTE: Depoimentos Reais */}
+        {/* Prova Social - Depoimentos Reais vindos do Supabase */}
         <section className="py-40 bg-black/40 relative border-b border-white/5">
            <div className="container mx-auto px-4 space-y-24 relative z-10 text-center">
               <Reveal>
@@ -274,11 +257,11 @@ export default async function Home() {
               </Reveal>
 
               <div className="grid gap-10 md:grid-cols-3">
-                 {realTestimonials.map((t: any, i: number) => (
+                 {testimonials.map((t: any, i: number) => (
                     <Reveal key={t.id} className={`stagger-${i+1}`}>
                        <div className="glass-elite p-12 rounded-[4rem] space-y-8 hover:border-brand-neon/20 transition-all group h-full flex flex-col justify-between text-left">
                           <div className="text-brand-neon flex gap-1">
-                             {[...Array(5)].map((_, star) => <Zap key={star} className="w-3 h-3 fill-brand-neon" />)}
+                             {[...Array(t.rating || 5)].map((_, star) => <Zap key={star} className="w-3 h-3 fill-brand-neon" />)}
                           </div>
                           <p className="text-gray-300 italic text-lg leading-relaxed font-medium">"{t.quote}"</p>
                           <div className="flex items-center gap-5 pt-10 border-t border-white/5">
@@ -295,11 +278,12 @@ export default async function Home() {
            </div>
         </section>
 
-        {/* NOVA SEÇÃO: Escola Centum */}
-        <section className="py-32 bg-transparent">
+        {/* Escola Centum - Refinada com "Aura" Roxa */}
+        <section className="py-32 bg-transparent relative overflow-hidden">
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-brand-purple/5 blur-[150px] -z-10"></div>
            <div className="container mx-auto px-4">
-              <Reveal className="glass-elite rounded-[4rem] p-12 md:p-20 border border-white/5 flex flex-col md:flex-row items-center justify-between gap-12 relative overflow-hidden group">
-                 <div className="absolute top-0 right-0 w-96 h-96 bg-brand-purple/5 blur-[100px] group-hover:bg-brand-purple/10 transition-all rounded-full translate-x-1/2 -translate-y-1/2"></div>
+              <Reveal className="glass-elite rounded-[4rem] p-12 md:p-20 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-12 relative overflow-hidden group hover:border-brand-purple/30 transition-all duration-700 bg-black/40">
+                 <div className="absolute top-0 right-0 w-96 h-96 bg-brand-purple/5 blur-[100px] group-hover:bg-brand-purple/20 transition-all rounded-full translate-x-1/2 -translate-y-1/2"></div>
                  <div className="space-y-6 text-center md:text-left relative z-10">
                     <div className="flex items-center gap-3 w-fit mx-auto md:mx-0 bg-brand-purple/10 px-4 py-2 rounded-full border border-brand-purple/20">
                        <BookOpen className="w-4 h-4 text-brand-purple" />
@@ -308,7 +292,7 @@ export default async function Home() {
                     <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter text-white uppercase leading-none">Conheça também a <br/><span className="text-brand-purple">Escola Centum.</span></h2>
                     <p className="max-w-xl text-gray-400 text-lg leading-relaxed">Nossa frente educacional e ecossistema de negócios para empreendedores que desejam dominar o próprio crescimento e parar de depender do improviso.</p>
                  </div>
-                 <Link href="#" className="btn-epic glass-elite py-5 px-10 text-[11px] tracking-[0.3em] font-black flex items-center gap-3 hover:bg-brand-purple hover:text-white transition-all relative z-10 group-hover:scale-105">
+                 <Link href="#" className="btn-epic glass-elite py-5 px-10 text-[11px] tracking-[0.3em] font-black flex items-center gap-3 hover:bg-brand-purple hover:text-white transition-all relative z-10 group-hover:scale-105 border-white/5 active:scale-95 shadow-2xl">
                     SABER MAIS <ArrowUpRight className="w-4 h-4" />
                  </Link>
               </Reveal>

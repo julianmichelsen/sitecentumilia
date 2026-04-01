@@ -80,12 +80,10 @@ export default async function Home() {
             </Reveal>
             
             <Reveal className="stagger-1 w-full overflow-visible relative">
-               {/* AJUSTE PREMIUM: Redução para 6rem e leading-tight para maior elegância e equilíbrio visual */}
-               <h1 className="text-5xl font-black tracking-tighter text-white md:text-7xl lg:text-[6.5rem] italic uppercase leading-[1.1] mb-10 drop-shadow-2xl py-10 overflow-visible">
-                 Pare de depender do <br />
-                 <span className="text-gradient pr-4">improviso.</span> <br />
-                 Comece a viver de <br />
-                 <span className="text-gradient pr-4" style={{ animationDelay: '-2s' }}>processo.</span>
+               {/* AJUSTE DESIGN ELITE: Fonte equilibrada, balanceamento de texto e remoção de quebras manuais jankies */}
+               <h1 className="text-5xl font-black tracking-tighter text-white md:text-7xl lg:text-[5.5rem] italic uppercase leading-[1.05] mb-12 drop-shadow-2xl py-10 overflow-visible [text-wrap:balance]">
+                 Pare de depender do <span className="text-gradient pr-4">improviso.</span>
+                 <span className="block md:inline-block md:ml-4">Comece a viver de <span className="text-gradient pr-4" style={{ animationDelay: '-2s' }}>processo.</span></span>
                </h1>
             </Reveal>
 

@@ -14,9 +14,20 @@ import {
   Zap,
   Briefcase
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+       await fetch('/api/auth', { method: 'DELETE' });
+       router.push('/admin/login');
+    } catch (_) {
+       router.push('/admin/login');
+    }
+  };
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
@@ -61,12 +72,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         <div className="mt-auto pt-8 border-t border-white/5">
-          <Link
-            href="/"
-            className="flex items-center gap-4 px-5 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-gray-700 hover:text-brand-neon transition-all"
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-4 px-5 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-gray-700 hover:text-brand-neon transition-all"
           >
             <LogOut className="h-4 w-4" /> Sair do Painel
-          </Link>
+          </button>
         </div>
       </aside>
 

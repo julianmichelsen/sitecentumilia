@@ -4,22 +4,33 @@ import { validateCredentials, getAuthToken, getCookieName, isAuthConfigured } fr
 export async function POST(request: NextRequest) {
   try {
     if (!isAuthConfigured()) {
-      return NextResponse.json({ error: 'Configuração de autenticação não definida' }, { status: 500 });
+      console.error('Auth configuration missing:', {
+        hasUser: !!process.env.ADMIN_USERNAME,
+        hasPass: !!process.env.ADMIN_PASSWORD,
+        hasToken: !!process.env.ADMIN_AUTH_TOKEN
+      });
+      return NextResponse.json({ 
+        error: 'Servidor não configurado corretamente. Verifique as variáveis de ambiente.' 
+      }, { status: 500 });
     }
 
     const body = await request.json();
     const { username, password } = body;
 
     if (!username || !password) {
-      return NextResponse.json({ error: 'Credenciais obrigatórias' }, { status: 400 });
+      return NextResponse.json({ error: 'Usuário e senha são obrigatórios' }, { status: 400 });
     }
 
     if (!validateCredentials(username, password)) {
-      return NextResponse.json({ error: 'Credenciais inválidas' }, { status: 401 });
+      return NextResponse.json({ error: 'Usuário ou senha incorretos' }, { status: 401 });
     }
 
-    const response = NextResponse.json({ success: true, message: 'Login realizado com sucesso' });
+    const response = NextResponse.json({ 
+      success: true, 
+      message: 'Login realizado com sucesso' 
+    });
     
+    // Set authentication cookie
     response.cookies.set(getCookieName(), getAuthToken(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

@@ -1,28 +1,31 @@
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-const AUTH_TOKEN = process.env.ADMIN_AUTH_TOKEN;
-const COOKIE_NAME = process.env.ADMIN_AUTH_COOKIE_NAME || 'centumilia_auth';
-
 export function isAuthConfigured(): boolean {
-  return Boolean(ADMIN_USERNAME && ADMIN_PASSWORD && AUTH_TOKEN);
+  return Boolean(
+    process.env.ADMIN_USERNAME && 
+    process.env.ADMIN_PASSWORD && 
+    process.env.ADMIN_AUTH_TOKEN
+  );
 }
 
 export function validateCredentials(username: string, password: string): boolean {
-  if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+  const adminUsername = process.env.ADMIN_USERNAME;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminUsername || !adminPassword) {
     return false;
   }
 
-  return username === ADMIN_USERNAME && password === ADMIN_PASSWORD;
+  return username === adminUsername && password === adminPassword;
 }
 
 export function getAuthToken(): string {
-  return AUTH_TOKEN || '';
+  return process.env.ADMIN_AUTH_TOKEN || '';
 }
 
 export function getCookieName(): string {
-  return COOKIE_NAME;
+  return process.env.ADMIN_AUTH_COOKIE_NAME || 'centumilia_auth';
 }
 
 export function verifyToken(token: string | undefined): boolean {
-  return Boolean(AUTH_TOKEN) && token === AUTH_TOKEN;
+  const authToken = process.env.ADMIN_AUTH_TOKEN;
+  return Boolean(authToken) && token === authToken;
 }

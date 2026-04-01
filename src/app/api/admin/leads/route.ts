@@ -1,6 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { isAuthenticated } from '@/lib/auth';
+import { validate } from '@/lib/validation';
+
+const leadCreateSchema = z.object({
+  nome: z.string().min(1, 'nome obrigatório'),
+  empresa: z.string().optional(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  segment: z.string().optional(),
+  message: z.string().optional(),
+  status: z.string().optional()
+});
+
+const leadUpdateSchema = leadCreateSchema.merge(z.object({
+  id: z.string().min(1, 'id obrigatório')
+}));
+
+const idQuerySchema = z.object({
+  id: z.string().min(1, 'id obrigatório')
+});
 
 // GET: Lista todos os leads
 export async function GET() {
@@ -24,8 +44,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { nome, empresa, email, phone, segment, message, status } = body;
+    const parsed = validate(leadCreateSchema, await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Dados inválidos', details: parsed.errors }, { status: 400 });
+    }
+    const { nome, empresa, email, phone, segment, message, status } = parsed.data;
 
     const { data, error } = await supabaseAdmin
       .from('leads')
@@ -47,8 +70,11 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { id, ...updates } = body;
+    const parsed = validate(leadUpdateSchema, await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Dados inválidos', details: parsed.errors }, { status: 400 });
+    }
+    const { id, ...updates } = parsed.data;
 
     const { data, error } = await supabaseAdmin
       .from('leads')
@@ -72,9 +98,11 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-
-    if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    const parsed = validate(idQuerySchema, Object.fromEntries(searchParams.entries()));
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+    const { id } = parsed.data;
 
     const { error } = await supabaseAdmin
       .from('leads')

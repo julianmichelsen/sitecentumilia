@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { isAuthenticated } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { validate } from '@/lib/validation';
+
+const configSchema = z.object({
+  siteName: z.string().min(1, 'siteName obrigatório'),
+  tagline: z.string().optional(),
+  phone: z.string().optional(),
+  whatsapp: z.string().optional(),
+  email: z.string().email().optional(),
+  location: z.string().optional(),
+  instagram: z.string().optional(),
+  linkedin: z.string().optional()
+});
 
 export async function GET() {
   if (!isAuthenticated()) {
@@ -24,7 +37,11 @@ export async function POST(request: NextRequest) {
   if (!isAuthenticated()) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
-  const body = await request.json();
+  const parsed = validate(configSchema, await request.json());
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Dados inválidos', details: parsed.errors }, { status: 400 });
+  }
+  const body = parsed.data;
   const dbData = {
     id: 1,
     site_name: body.siteName,
